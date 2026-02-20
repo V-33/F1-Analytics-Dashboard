@@ -1,0 +1,1 @@
+console.log("Logged Driver:", localStorage.getItem("loggedDriver"));

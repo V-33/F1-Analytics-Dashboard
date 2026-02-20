@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Analytics Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --f1-red: #e10600;
+    --dark-bg: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.85);
+    --light-grey: #cbd5e1;
+    --white: #ffffff;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(rgba(15,23,42,0.85), rgba(15,23,42,0.95)),
+                url('images/index_background.png') center/cover no-repeat fixed;
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(8px);
+    background: rgba(15, 23, 42, 0.7);
+    border-bottom: 3px solid var(--f1-red);
+    padding: 1.4rem 2rem;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 1.5rem;
+}
+
+
+.role-container {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.role-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    width: 280px;
+    padding: 2rem;
+    border-radius: 18px;
+    text-align: center;
+    transition: all 0.35s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+    position: relative;
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeUp 0.8s forwards;
+}
+
+.role-card:nth-child(1) { animation-delay: 0.2s; }
+.role-card:nth-child(2) { animation-delay: 0.4s; }
+.role-card:nth-child(3) { animation-delay: 0.6s; }
+
+.role-card h2 {
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.role-card p {
+    color: var(--light-grey);
+    font-size: 0.95rem;
+}
+
+.role-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--f1-red);
+    box-shadow: 0 12px 28px rgba(225, 6, 0, 0.35);
+}
+
+.role-card::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 4px;
+    width: 0%;
+    background: var(--f1-red);
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+
+.role-card:hover::after {
+    width: 80%;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--light-grey);
+    font-size: 0.85rem;
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .role-card {
+        width: 100%;
+        max-width: 350px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    F1 ANALYTICS DASHBOARD
+</header>
+
+<main>
+    <div class="role-container">
+
+        <div class="role-card" onclick="selectRole('driver')">
+            <h2>Driver</h2>
+            <p>Access personal statistics, race performance, and analytics insights on teams.</p>
+        </div>
+
+        <div class="role-card" onclick="selectRole('team')">
+            <h2>Team</h2>
+            <p>Monitor constructor performance, strategies, season progression and analyze driver metrics</p>
+        </div>
+
+        <div class="role-card" onclick="selectRole('fantasy')">
+            <h2>Fantasy</h2>
+            <p>Compare drivers, teams and track fantasy standings.</p>
+        </div>
+
+    </div>
+</main>
+
+<footer>
+    © 2026 F1 Analytics Dashboard | Academic Project
+</footer>
+
+<script>
+function selectRole(role) {
+    localStorage.setItem("selectedRole", role);
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

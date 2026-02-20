@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Analytics Dashboard - Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
+                url('images/login_background.jpg') center/cover no-repeat;
+    color: white;
+}
+
+header {
+    padding: 20px 40px;
+    background: rgba(20, 25, 35, 0.85);
+    backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e10600;
+}
+
+header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+header span {
+    color: #e10600;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.login-card {
+    background: rgba(25, 30, 40, 0.9);
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.6);
+    animation: fadeSlide 0.8s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeSlide {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 6px;
+    background: #2d3445;
+    color: white;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border: 1px solid #e10600;
+    box-shadow: 0 0 8px rgba(225,6,0,0.6);
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #e10600;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+button:hover {
+    border-color: #ff1a1a;
+    transform: translateY(-2px);
+}
+
+.back-btn {
+    background: transparent;
+    border: 1px solid #888;
+    margin-top: 15px;
+}
+
+.back-btn:hover {
+    border-color: #e10600;
+    color: #e10600;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background: rgba(20, 25, 35, 0.85);
+    border-top: 2px solid #e10600;
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .login-card {
+        padding: 30px 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>F1 <span>Analytics Dashboard</span></h1>
+</header>
+
+<main>
+    <div class="login-card">
+        <h2>Login</h2>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" placeholder="Enter username" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit">Login</button>
+
+            <button type="button" class="back-btn" onclick="window.location.href='index.html'">
+                ← Back to Role Selection
+            </button>
+        </form>
+    </div>
+</main>
+
+<footer>
+    © 2026 F1 Analytics Dashboard | Designed for Performance & Precision
+</footer>
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const username = document.querySelector("input[type='text']").value;
+
+    if (username.toLowerCase() === "charles leclerc") {
+        localStorage.setItem("loggedDriver", "Charles Leclerc");
+        localStorage.setItem("loggedTeam", "Ferrari");
+        window.location.href = "driver.html";
+    } else {
+        alert("Driver not found.");
+    }
+});
+</script>
+</body>
+</html>

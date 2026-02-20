@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Analytics Dashboard - Driver</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:'Inter',sans-serif;
+    background:#0f141c;
+    color:white;
+}
+
+header{
+    padding:20px 40px;
+    background:#151b25;
+    border-bottom:3px solid #e10600;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+header h1{
+    font-family:'Orbitron',sans-serif;
+    font-size:1.5rem;
+}
+
+main{
+    padding:30px;
+    max-width:1400px;
+    margin:auto;
+}
+
+.section{
+    margin-bottom:40px;
+}
+
+.kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+}
+
+.kpi-card{
+    background:#1c2430;
+    padding:20px;
+    border-radius:10px;
+    border-bottom:3px solid #e10600;
+    text-align:center;
+}
+
+.kpi-card h3{
+    font-size:0.9rem;
+    color:#aaa;
+    margin-bottom:8px;
+}
+
+.kpi-card p{
+    font-size:1.6rem;
+    font-weight:600;
+}
+
+.chart-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
+    gap:30px;
+}
+
+.chart-card{
+    background:#1c2430;
+    padding:20px;
+    border-radius:10px;
+}
+
+.career-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+}
+
+.career-card{
+    background:#1c2430;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.contract-card{
+    background:#1c2430;
+    padding:25px;
+    border-radius:10px;
+}
+
+footer{
+    text-align:center;
+    padding:15px;
+    background:#151b25;
+    border-top:3px solid #e10600;
+    color:#aaa;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>F1 Analytics Dashboard</h1>
+    <div id="driverName"></div>
+</header>
+
+<main>
+
+<div class="section">
+    <div class="kpi-grid" id="kpiGrid"></div>
+</div>
+
+<div class="section chart-grid">
+    <div class="chart-card">
+        <canvas id="driverRadar"></canvas>
+    </div>
+    <div class="chart-card">
+        <canvas id="teamRadar"></canvas>
+    </div>
+    <div class="chart-card">
+        <canvas id="pointsBar"></canvas>
+    </div>
+</div>
+
+<div class="section">
+    <h2 style="margin-bottom:20px;">Career Overview</h2>
+    <div class="career-grid" id="careerGrid"></div>
+</div>
+
+<div class="section">
+    <h2 style="margin-bottom:20px;">Contract Details</h2>
+    <div class="contract-card" id="contractPanel"></div>
+</div>
+
+</main>
+
+<footer>
+© 2026 F1 Analytics Dashboard
+</footer>
+
+<script>
+
+fetch("data/database.json")
+.then(res => res.json())
+.then(data => {
+
+    const loggedInUsername = localStorage.getItem("loggedDriver");
+    if (!loggedInUsername) return;
+    console.log(loggedInUsername);
+    const driver = data.drivers.find(d =>
+        d.personalDetails.fullName === loggedInUsername
+    );
+    console.log(driver.personalDetails.fullName);
+    if (!driver) return;
+
+    const team = data.teams.find(t =>
+        driver.personalDetails.currentTeam.includes(t.teamName)
+    );
+
+    const teammateName = team.drivers.find(name =>
+        name !== driver.personalDetails.fullName
+    );
+    console.log(teammateName);
+    const teammate = data.drivers.find(d =>
+        d.personalDetails.fullName === teammateName
+    );
+    console.log(teammate);
+    document.getElementById("driverName").innerText =
+        driver.personalDetails.fullName;
+
+    /* KPI */
+    const kpis = [
+        {label:"Overall Rating", value:driver.driverRatings.overall},
+        {label:"Qualifying Pace", value:driver.driverRatings.qualifyingPace},
+        {label:"Consistency", value:driver.driverRatings.consistency},
+        {label:"Constructor Standing", value:team.seasonStatistics.constructorStanding},
+        {label:"Team Points (2025)", value:team.seasonStatistics.points},
+        {label:"Team Wins (2025)", value:team.seasonStatistics.wins}
+    ];
+
+    const kpiGrid = document.getElementById("kpiGrid");
+    kpis.forEach(k=>{
+        kpiGrid.innerHTML += `
+            <div class="kpi-card">
+                <h3>${k.label}</h3>
+                <p>${k.value}</p>
+            </div>
+        `;
+    });
+
+    /* DRIVER RADAR */
+    new Chart(document.getElementById("driverRadar"),{
+        type:"radar",
+        data:{
+            labels:["Race Craft","Qualifying","Consistency","Aggression","Wet Skill","Tire Mgmt","Mental"],
+            datasets:[
+                {
+                    label:driver.personalDetails.fullName,
+                    data:Object.values(driver.driverRatings).slice(1,8),
+                    borderColor:"#e10600",
+                    backgroundColor:"rgba(225,6,0,0.2)"
+                },
+                teammate && {
+                    label:teammate.personalDetails.fullName,
+                    data:Object.values(teammate.driverRatings).slice(1,8),
+                    borderColor:"#ffffff",
+                    backgroundColor:"rgba(255,255,255,0.1)"
+                }
+            ].filter(Boolean)
+        },
+        options:{responsive:true,scales:{r:{beginAtZero:true,max:10}}}
+    });
+
+    /* TEAM RADAR */
+    new Chart(document.getElementById("teamRadar"),{
+        type:"radar",
+        data:{
+            labels:["Pit Stop","Strategy","Power Unit","Reliability","Aero","Team Dynamics","Stability"],
+            datasets:[{
+                label:team.teamName,
+                data:Object.values(team.performanceRatings),
+                borderColor:"#e10600",
+                backgroundColor:"rgba(225,6,0,0.2)"
+            }]
+        },
+        options:{responsive:true,scales:{r:{beginAtZero:true,max:10}}}
+    });
+
+    /* DRIVER VS TEAMMATE POINTS BAR */
+    new Chart(document.getElementById("pointsBar"),{
+        type:"bar",
+        data:{
+            labels:[driver.personalDetails.fullName, teammate.personalDetails.fullName],
+            datasets:[{
+                label:"2025 Points",
+                data:[
+                    driver.seasonStats.points,
+                    teammate.seasonStats.points
+                ]
+            }]
+        },
+        options:{
+            responsive:true,
+            plugins:{
+                legend:{display:false}
+            }
+        }
+    });
+
+    /* CAREER */
+    const careerGrid = document.getElementById("careerGrid");
+    Object.entries(driver.careerStats).forEach(([key,value])=>{
+        careerGrid.innerHTML += `
+            <div class="career-card">
+                <h3>${key}</h3>
+                <p style="font-size:1.4rem;font-weight:600;margin-top:8px;">
+                    ${value}
+                </p>
+            </div>
+        `;
+    });
+
+    /* CONTRACT */
+    const contract = driver.contract;
+
+    document.getElementById("contractPanel").innerHTML = `
+        <p><strong>Team:</strong> ${contract.team}</p>
+        <p><strong>Contract End:</strong> ${contract.endDate}</p>
+        <p><strong>Base Salary:</strong> €${contract.baseSalary.toLocaleString()}</p>
+        <p><strong>Release Clause:</strong> €${contract.releaseClause.toLocaleString()}</p>
+        <p><strong>Status:</strong> ${contract.status}</p>
+    `;
+
+})
+.catch(err=>console.error(err));
+
+</script>
+
+</body>
+</html>

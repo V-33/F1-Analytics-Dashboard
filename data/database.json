@@ -115,6 +115,11 @@
         "dnfs": 34,
         "poleWinRatio": 0.99
       },
+      "seasonStats":{
+        "points": 100,
+        "avgRaceFinish":6,
+        "avgQualifying":7
+      },
       "driverRatings": {
         "overall": 9,
         "raceCraft": 10,
@@ -191,6 +196,11 @@
         "worldChampionships": 0,
         "dnfs": 23,
         "poleWinRatio": 3.375
+      },
+      "seasonStats":{
+        "points": 150,
+        "avgRaceFinish":4,
+        "avgQualifying":5
       },
       "driverRatings": {
         "overall": 9,
@@ -1458,7 +1468,7 @@
       "stability": 9
     },
 
-    "drivers": ["Chareles Leclerc","Lewis Hamilton"]
+    "drivers": ["Charles Leclerc","Lewis Hamilton"]
   },
 
   {

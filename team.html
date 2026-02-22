@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Analytics Dashboard - Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #0c1118;
+    --panel: #171f2c;
+    --panel-soft: #121924;
+    --border: rgba(255, 255, 255, 0.12);
+    --text: #f5f7fa;
+    --muted: #9ca3af;
+    --accent: #e10600;
+    --accent-soft: rgba(225, 6, 0, 0.18);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(rgba(11, 17, 24, 0.92), rgba(11, 17, 24, 0.95)),
+                url('images/index_background.png') center/cover fixed no-repeat;
+    color: var(--text);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+header {
+    height: 68px;
+    padding: 14px 20px;
+    background: rgba(17, 23, 33, 0.86);
+    border-bottom: 2px solid var(--accent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.7px;
+}
+
+.meta {
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+main {
+    height: calc(100vh - 112px);
+    padding: 12px;
+}
+
+.dash-grid {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    grid-template-rows: 48% 52%;
+    gap: 10px;
+}
+
+.panel {
+    background: linear-gradient(145deg, rgba(23, 31, 44, 0.96), rgba(18, 25, 36, 0.96));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.panel-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.7px;
+    color: #d9dde4;
+    margin-bottom: 8px;
+}
+
+.left-top {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
+}
+
+.kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(90px, 1fr));
+    gap: 8px;
+}
+
+.kpi {
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--accent);
+    border-radius: 9px;
+    padding: 8px;
+}
+
+.kpi p {
+    font-size: 0.68rem;
+    color: var(--muted);
+}
+
+.kpi h3 {
+    margin-top: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-table-wrap {
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 520px;
+}
+
+th, td {
+    font-size: 0.76rem;
+    padding: 7px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+th {
+    text-align: left;
+    color: #d6dae2;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.67rem;
+    letter-spacing: 0.55px;
+}
+
+tr:hover {
+    background: var(--accent-soft);
+}
+
+.right-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.chart-box {
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.chart-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+}
+
+.chart-canvas {
+    position: relative;
+    flex: 1;
+    min-height: 220px;
+}
+
+.chart-canvas canvas {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.left-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.scroller {
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel-soft);
+}
+
+.driver-row {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.76rem;
+}
+
+.driver-row b {
+    color: #ffffff;
+}
+
+.chip-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.chip {
+    font-size: 0.68rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 3px 7px;
+    border-radius: 999px;
+}
+
+.right-bottom {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
+}
+
+.hot-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.hot-card {
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.hot-card p {
+    font-size: 0.68rem;
+    color: var(--muted);
+}
+
+.hot-card h4 {
+    margin-top: 5px;
+    font-size: 0.86rem;
+}
+
+.team-card-list {
+    overflow: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+}
+
+.team-card {
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 0.76rem;
+}
+
+.team-card .head {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.team-card .line {
+    color: #d8dce5;
+}
+
+.team-card .line span {
+    color: var(--muted);
+}
+
+.top-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.back-btn {
+    border: 1px solid #6b7280;
+    background: transparent;
+    color: #e5e7eb;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.75rem;
+}
+
+.back-btn:hover {
+    border-color: var(--accent);
+}
+
+footer {
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(17, 23, 33, 0.86);
+    border-top: 2px solid var(--accent);
+    color: #9ca3af;
+    font-size: 0.78rem;
+}
+
+@media (max-width: 1080px) {
+    body {
+        overflow: auto;
+    }
+
+    main {
+        height: auto;
+    }
+
+    .dash-grid {
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .right-top,
+    .left-bottom,
+    .hot-board {
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-strip {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+</head>
+<body>
+<header>
+    <h1>F1 Analytics Dashboard | Team Analytics</h1>
+    <div class="meta" id="seasonMeta">Loading dataset...</div>
+</header>
+
+<main>
+    <div class="dash-grid">
+        <section class="panel left-top">
+            <div class="top-actions">
+                <button class="back-btn" onclick="window.location.href='index.html'">Back</button>
+            </div>
+            <div class="kpi-strip" id="kpiStrip"></div>
+            <div class="mini-table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>P</th>
+                            <th>Team</th>
+                            <th>Pts</th>
+                            <th>W</th>
+                            <th>Pod</th>
+                            <th>Poles</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingsBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel right-top">
+            <div class="chart-box">
+                <div class="chart-label">Constructor Points (Bar)</div>
+                <div class="chart-canvas">
+                    <canvas id="pointsBarChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-label">Points Share (Pie)</div>
+                <div class="chart-canvas">
+                    <canvas id="pointsPieChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel left-bottom">
+            <div>
+                <div class="panel-title">Driver Pair Snapshot</div>
+                <div class="scroller" id="driverSnapshot"></div>
+            </div>
+            <div>
+                <div class="panel-title">Team Rating Mix</div>
+                <div class="scroller" id="ratingSnapshot"></div>
+            </div>
+        </section>
+
+        <section class="panel right-bottom">
+            <div class="hot-board" id="hotBoard"></div>
+            <div class="team-card-list" id="teamCardList"></div>
+        </section>
+    </div>
+</main>
+
+<footer>&copy; 2026 F1 Analytics Dashboard | Basic dataset analytics</footer>
+
+<script>
+let pointsBarChart;
+let pointsPieChart;
+
+function safeNumber(value, fallback = 0) {
+    return Number.isFinite(Number(value)) ? Number(value) : fallback;
+}
+
+function findDriverProfile(drivers, teamDriverName) {
+    const key = String(teamDriverName || "").trim().toLowerCase();
+    if (!key) return null;
+
+    return drivers.find((d) => {
+        const fullName = (d.personalDetails && d.personalDetails.fullName ? d.personalDetails.fullName : "").toLowerCase();
+        return fullName === key || fullName.includes(key) || key.includes(fullName);
+    }) || null;
+}
+
+function createPointsBarChart(labels, points) {
+    const ctx = document.getElementById("pointsBarChart");
+    if (pointsBarChart) pointsBarChart.destroy();
+    pointsBarChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Points",
+                    data: points,
+                    borderRadius: 5,
+                    backgroundColor: [
+                        "rgba(225, 6, 0, 0.88)",
+                        "rgba(255, 69, 58, 0.85)",
+                        "rgba(255, 110, 102, 0.82)",
+                        "rgba(220, 80, 70, 0.78)",
+                        "rgba(190, 55, 47, 0.75)"
+                    ],
+                    borderColor: "rgba(255,255,255,0.3)",
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    ticks: { color: "#dbe2ef", font: { size: 10 } },
+                    grid: { color: "rgba(255,255,255,0.08)" }
+                },
+                y: {
+                    ticks: { color: "#dbe2ef", font: { size: 10 } },
+                    grid: { color: "rgba(255,255,255,0.08)" }
+                }
+            }
+        }
+    });
+}
+
+function createPointsPieChart(labels, points) {
+    const ctx = document.getElementById("pointsPieChart");
+    if (pointsPieChart) pointsPieChart.destroy();
+    pointsPieChart = new Chart(ctx, {
+        type: "pie",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    data: points,
+                    backgroundColor: [
+                        "#e10600",
+                        "#ff5a4f",
+                        "#ff8c61",
+                        "#ffb677",
+                        "#ffd4a5"
+                    ],
+                    borderColor: "#0f141c",
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: { color: "#dbe2ef", boxWidth: 9, font: { size: 10 } }
+                }
+            }
+        }
+    });
+}
+
+fetch("data/database.json")
+    .then((res) => res.json())
+    .then((data) => {
+        const teams = Array.isArray(data.teams) ? data.teams : [];
+        const drivers = Array.isArray(data.drivers) ? data.drivers : [];
+
+        document.getElementById("seasonMeta").textContent =
+            (data.championship || "F1") + " " + (data.season || "-") + " | source: basic dataset";
+
+        if (!teams.length) return;
+
+        const rankedTeams = [...teams].sort((a, b) => {
+            const sa = safeNumber(a.seasonStatistics && a.seasonStatistics.constructorStanding, 999);
+            const sb = safeNumber(b.seasonStatistics && b.seasonStatistics.constructorStanding, 999);
+            if (sa === 0 && sb !== 0) return 1;
+            if (sb === 0 && sa !== 0) return -1;
+            return sa - sb;
+        });
+
+        const totalPoints = rankedTeams.reduce((sum, t) => sum + safeNumber(t.seasonStatistics && t.seasonStatistics.points), 0);
+        const totalWins = rankedTeams.reduce((sum, t) => sum + safeNumber(t.seasonStatistics && t.seasonStatistics.wins), 0);
+        const bestTeam = rankedTeams[0];
+        const topScoring = [...rankedTeams].sort((a, b) => safeNumber(b.seasonStatistics && b.seasonStatistics.points) - safeNumber(a.seasonStatistics && a.seasonStatistics.points))[0];
+        const mostWins = [...rankedTeams].sort((a, b) => safeNumber(b.seasonStatistics && b.seasonStatistics.wins) - safeNumber(a.seasonStatistics && a.seasonStatistics.wins))[0];
+
+        const kpis = [
+            { label: "Teams", value: rankedTeams.length },
+            { label: "Total Points", value: totalPoints },
+            { label: "Total Wins", value: totalWins },
+            { label: "Leader", value: bestTeam ? bestTeam.teamName : "-" },
+            { label: "Top Scorer", value: topScoring ? topScoring.teamName : "-" }
+        ];
+
+        document.getElementById("kpiStrip").innerHTML = kpis.map((k) =>
+            "<div class=\"kpi\"><p>" + k.label + "</p><h3>" + k.value + "</h3></div>"
+        ).join("");
+
+        document.getElementById("standingsBody").innerHTML = rankedTeams.map((team) => {
+            const stats = team.seasonStatistics || {};
+            const standing = safeNumber(stats.constructorStanding);
+            return "<tr>" +
+                "<td>" + (standing || "-") + "</td>" +
+                "<td>" + (team.teamName || "-") + "</td>" +
+                "<td>" + safeNumber(stats.points) + "</td>" +
+                "<td>" + safeNumber(stats.wins) + "</td>" +
+                "<td>" + safeNumber(stats.podiums) + "</td>" +
+                "<td>" + safeNumber(stats.polePositions) + "</td>" +
+            "</tr>";
+        }).join("");
+
+        const barLabels = rankedTeams.map((t) => t.teamName || "Team");
+        const barPoints = rankedTeams.map((t) => safeNumber(t.seasonStatistics && t.seasonStatistics.points));
+        createPointsBarChart(barLabels, barPoints);
+        createPointsPieChart(barLabels, barPoints);
+
+        document.getElementById("driverSnapshot").innerHTML = rankedTeams.map((team) => {
+            const names = Array.isArray(team.drivers) ? team.drivers : [];
+            const profiles = names.map((name) => findDriverProfile(drivers, name)).filter(Boolean);
+            const avgRating = profiles.length
+                ? (profiles.reduce((s, d) => s + safeNumber(d.driverRatings && d.driverRatings.overall), 0) / profiles.length).toFixed(2)
+                : "-";
+            return "<div class=\"driver-row\">" +
+                "<b>" + (team.teamName || "-") + "</b> | Avg Rating: " + avgRating +
+                "<div class=\"chip-line\">" +
+                    (names.length ? names.map((n) => "<span class=\"chip\">" + n + "</span>").join("") : "<span class=\"chip\">No drivers</span>") +
+                "</div>" +
+            "</div>";
+        }).join("");
+
+        document.getElementById("ratingSnapshot").innerHTML = rankedTeams.map((team) => {
+            const perf = team.performanceRatings || {};
+            return "<div class=\"driver-row\">" +
+                "<b>" + (team.teamName || "-") + "</b><br>" +
+                "Pit: " + safeNumber(perf.pitStopSpeed) + " | Strat: " + safeNumber(perf.strategy) + " | PU: " + safeNumber(perf.powerUnit) +
+                "<br>Aero: " + safeNumber(perf.aerodynamics) + " | Rel: " + safeNumber(perf.reliability) + " | Stability: " + safeNumber(perf.stability) +
+            "</div>";
+        }).join("");
+
+        document.getElementById("hotBoard").innerHTML =
+            "<div class=\"hot-card\"><p>Most Wins</p><h4>" + (mostWins ? mostWins.teamName : "-") + "</h4></div>" +
+            "<div class=\"hot-card\"><p>Most Points</p><h4>" + (topScoring ? topScoring.teamName : "-") + "</h4></div>" +
+            "<div class=\"hot-card\"><p>Season</p><h4>" + (data.season || "-") + "</h4></div>";
+
+        document.getElementById("teamCardList").innerHTML = rankedTeams.map((team) => {
+            const s = team.seasonStatistics || {};
+            const h = team.teamStatistics || {};
+            return "<article class=\"team-card\">" +
+                "<div class=\"head\"><span>" + (team.teamName || "-") + "</span><span>P" + (safeNumber(s.constructorStanding) || "-") + "</span></div>" +
+                "<div class=\"line\"><span>Base:</span> " + (team.base || "-") + " | <span>PU:</span> " + (team.powerUnitSupplier || "-") + "</div>" +
+                "<div class=\"line\"><span>Principal:</span> " + (team.teamPrincipal || "-") + "</div>" +
+                "<div class=\"line\"><span>Pts:</span> " + safeNumber(s.points) + "  <span>Wins:</span> " + safeNumber(s.wins) + "  <span>Podiums:</span> " + safeNumber(s.podiums) + "</div>" +
+                "<div class=\"line\"><span>Titles:</span> " + safeNumber(h.championships) + "  <span>Total Wins:</span> " + safeNumber(h.totalWins) + "</div>" +
+            "</article>";
+        }).join("");
+    })
+    .catch(() => {
+        document.getElementById("seasonMeta").textContent = "Failed to load dataset.";
+    });
+</script>
+</body>
+</html>

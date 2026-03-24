@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="contracts.js"></script>
+<style>
+@font-face {
+  font-family: "Unity Sans";
+  src: url("fonts/UnitySans-Regular.woff2") format("woff2"),
+       url("fonts/UnitySans-Regular.woff") format("woff");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Unity Sans";
+  src: url("fonts/UnitySans-Bold.woff2") format("woff2"),
+       url("fonts/UnitySans-Bold.woff") format("woff");
+  font-weight: 700;
+}
+@font-face {
+  font-family: "RB Futura";
+  src: url("fonts/FuturaCyrillicBook.woff2") format("woff2"),
+       url("fonts/FuturaCyrillicBook.woff") format("woff");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "RB Futura";
+  src: url("fonts/FuturaCyrillicBold.woff2") format("woff2"),
+       url("fonts/FuturaCyrillicBold.woff") format("woff");
+  font-weight: 700;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: #000;
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Cursor ── */
+.cursor {
+  width: 12px; height: 12px;
+  background: #e10600;
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 100000;
+  transform: translate(-50%, -50%);
+  transition: background 0.2s;
+}
+.cursor-trail {
+  width: 28px; height: 28px;
+  border: 2px solid rgba(225,6,0,0.55);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: border-color 0.2s;
+}
+@media (max-width: 600px) { .cursor, .cursor-trail { display: none; } }
+
+/* ── Layout ── */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0a;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  z-index: 100;
+  transition: background 0.4s;
+}
+.sidebar-top {
+  padding: 28px 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-driver {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  color: #fff;
+}
+.sidebar-team {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.sidebar-accent-bar {
+  height: 3px;
+  width: 40px;
+  border-radius: 2px;
+  margin-top: 10px;
+  background: #e10600;
+  transition: background 0.4s;
+}
+
+.nav {
+  flex: 1;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 20px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.62);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  user-select: none;
+  text-decoration: none;
+}
+.nav-link:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+.nav-link.active {
+  color: #fff;
+  border-left-color: #e10600;
+  background: rgba(255,255,255,0.07);
+}
+.nav-icon { font-size: 1rem; opacity: 0.8; }
+
+.sidebar-bottom {
+  padding: 16px 20px 24px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.btn-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+  width: 100%;
+}
+.btn-theme-toggle:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.btn-offers {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-offers:hover { background: rgba(255,255,255,0.12); }
+.btn-logout {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(225,6,0,0.14);
+  border: 1px solid rgba(225,6,0,0.3);
+  color: #e10600;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+.btn-logout:hover { background: rgba(225,6,0,0.25); }
+
+/* ── Main ── */
+.main {
+  margin-left: 220px;
+  flex: 1;
+  padding: 36px 40px 60px;
+  min-height: 100vh;
+}
+
+/* ── Top accent bar ── */
+.top-bar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, #e10600, #ff6b00, #e10600);
+  z-index: 200;
+  transition: background 0.4s;
+}
+
+/* ── Sections ── */
+.section { display: none; animation: fadeInUp 0.55s ease-out; }
+.section.active { display: block; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Section header ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.section-accent {
+  width: 6px; height: 34px;
+  border-radius: 3px;
+  background: #e10600;
+  flex-shrink: 0;
+  transition: background 0.4s;
+}
+.section-title {
+  font-size: 1.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.14);
+}
+
+/* ── Grids ── */
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+}
+@media (max-width: 1100px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 700px)  { .grid-4, .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+/* ── Cards ── */
+.card {
+  background: #0a0a0a;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 26px;
+  position: relative;
+  overflow: visible;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  color: #fff;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.4);
+}
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: radial-gradient(circle at 20% 20%, rgba(225,6,0,0.12), transparent 66%);
+  opacity: 0;
+  transition: opacity 0.24s;
+  pointer-events: none;
+}
+.card:hover::before { opacity: 1; }
+
+.label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.label-ac {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+  color: #e10600;
+  opacity: 0.9;
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  transition: color 0.4s;
+}
+.value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: #fff;
+}
+.value-sm {
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+}
+.value-md {
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #fff;
+}
+.note {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.45);
+  margin-top: 6px;
+}
+.gold      { color: #b8aa76; }
+.green     { color: #22c55e; }
+.red       { color: #e10600; }
+.value-gold { color: #b8aa76; }
+
+/* ── Info tooltip ── */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.6);
+  font-size: 0.62rem;
+  font-weight: 700;
+  font-style: normal;
+  cursor: help;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  vertical-align: middle;
+  line-height: 1;
+  transition: background 0.2s;
+}
+.info-icon:hover { background: rgba(255,255,255,0.3); }
+.info-icon::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1c1c1c;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  padding: 6px 11px;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.18s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+  font-family: "Poppins", sans-serif;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.info-icon:hover::after { opacity: 1; }
+
+/* ── Hero ── */
+.hero {
+  background: #0a0a0a;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 32px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(225,6,0,0.09), transparent 70%);
+  pointer-events: none;
+  transition: background 0.4s;
+}
+.hero-number {
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.12;
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  letter-spacing: -4px;
+  transition: color 0.4s;
+  color: #fff;
+}
+.hero-avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 2px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+.hero-info { flex: 1; }
+.hero-name {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 6px;
+  color: #fff;
+}
+.hero-meta {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.55);
+}
+.status-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+  background: rgba(34,197,94,0.15);
+  border: 1px solid rgba(34,197,94,0.35);
+  color: #22c55e;
+}
+
+/* ── Chart boxes ── */
+.chart-box {
+  background: #0a0a0a;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 26px;
+  margin-bottom: 28px;
+}
+.chart-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 18px;
+}
+.chart-box canvas { max-height: 240px; }
+
+/* ── Progress bar (analytic style) ── */
+.progress-bar-wrap {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  margin-top: 12px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: #e10600;
+  transform-origin: left;
+  transition: transform 0.8s ease, background 0.4s;
+}
+
+/* ── Loading ── */
+.loading-screen {
+  position: fixed; inset: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  flex-direction: column;
+  gap: 20px;
+}
+.loading-dots { display: flex; gap: 8px; }
+.loading-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #e10600;
+  display: inline-block;
+  animation: ldpulse 1.2s ease-in-out infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ldpulse { 0%,80%,100%{transform:scale(0.8);opacity:0.5} 40%{transform:scale(1.2);opacity:1} }
+.loading-text { font-size: 0.88rem; color: rgba(255,255,255,0.4); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 32px; right: 32px;
+  background: #0a0a0a;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 14px 22px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  z-index: 99998;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  max-width: 320px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.toast-success { border-color: rgba(34,197,94,0.4); color: #22c55e; }
+.toast.toast-error   { border-color: rgba(225,6,0,0.4);   color: #e10600; }
+.toast.toast-info    { border-color: rgba(96,165,250,0.4); color: #60a5fa; }
+
+/* ── Spacing helpers ── */
+.mt-8  { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mb-8  { margin-bottom: 8px; }
+
+/* ── Financials v2 ── */
+.fin-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+@media (max-width: 1280px) { .fin-grid-5 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px)  { .fin-grid-5 { grid-template-columns: 1fr 1fr; } }
+
+.fin-card {
+  background: #0a0a0a;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.09);
+  padding: 26px 22px;
+  position: relative;
+  overflow: visible;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  color: #fff;
+}
+.fin-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 30px rgba(0,0,0,0.38);
+}
+.fin-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: radial-gradient(circle at 20% 20%, rgba(225,6,0,0.14), transparent 66%);
+  opacity: 0;
+  transition: opacity 0.24s;
+  pointer-events: none;
+}
+.fin-card:hover::before { opacity: 1; }
+.fin-card .label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.fin-card .value {
+  font-size: 1.65rem;
+  font-weight: 600;
+  line-height: 1.08;
+  color: #fff;
+}
+.fin-card .note {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.42);
+  margin-top: 6px;
+}
+
+.salary-panel {
+  background: #0a0a0a;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.09);
+  padding: 30px;
+  margin-bottom: 28px;
+}
+.salary-panel-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 22px;
+}
+.salary-bar-track {
+  height: 30px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 18px;
+}
+.salary-seg {
+  height: 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: width 0.95s cubic-bezier(0.22, 0.61, 0.36, 1), transform 0.95s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.salary-seg.base  { background: linear-gradient(90deg, #e10600, #ff4422); }
+.salary-seg.bonus { background: linear-gradient(90deg, #b8aa76, #d4c88a); }
+.salary-seg.endo  { background: linear-gradient(90deg, #22c55e, #34d399); }
+.salary-legend {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.salary-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.83rem;
+  color: rgba(255,255,255,0.65);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.salary-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 700px) { .salary-charts-row { grid-template-columns: 1fr; } }
+.salary-chart-box {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 18px;
+}
+.salary-chart-box .chart-title { font-size: 0.78rem; margin-bottom: 12px; }
+.salary-chart-box canvas { max-height: 200px; }
+
+/* ── Context card ── */
+.context-card {
+  background: rgba(14,28,50,0.64);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 26px;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  position: relative;
+}
+.context-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 30px rgba(0,0,0,0.32);
+}
+.context-card .label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.context-card .value {
+  font-size: 1.65rem;
+  font-weight: 600;
+  line-height: 1.08;
+  color: #fff;
+}
+.context-card .note {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.42);
+  margin-top: 6px;
+}
+
+/* ── Timeline ── */
+.timeline-wrap {
+  background: #0a0a0a;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.09);
+  padding: 30px 36px;
+  margin-bottom: 28px;
+}
+.timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 16px; bottom: 16px;
+  width: 2px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 1px;
+}
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 26px;
+  padding: 16px 0;
+  position: relative;
+}
+.timeline-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid #e10600;
+  background: #0a0a0a;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  font-weight: 700;
+  z-index: 1;
+  position: relative;
+  transition: border-color 0.4s, background 0.4s;
+}
+.timeline-dot.filled { background: #e10600; }
+.timeline-content { padding-top: 3px; }
+.timeline-year {
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+  color: #fff;
+}
+.timeline-label {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.timeline-note {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.36);
+  margin-top: 3px;
+}
+
+/* ── Contract: Progression panel ── */
+.prog-panel {
+  background: #0a0a0a;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+.prog-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.prog-metric {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.prog-metric .value { font-size: 1.55rem; }
+.prog-metric .value-md { font-size: 1.2rem; }
+.progress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #e10600;
+  transition: width 0.7s cubic-bezier(.4,0,.2,1), background 0.4s;
+}
+.prog-footnote {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 10px;
+}
+@media (max-width: 640px) { .prog-meta { grid-template-columns: 1fr; } }
+
+/* ── Contract: Trigger cards ── */
+.triggers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.trigger-card {
+  background: #0a0a0a;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 20px;
+}
+.trigger-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.trigger-title {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.82);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.trigger-pct {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e10600;
+  transition: color 0.4s;
+  white-space: nowrap;
+}
+.trigger-note {
+  font-size: 0.74rem;
+  color: rgba(255,255,255,0.38);
+  margin-top: 9px;
+}
+@media (max-width: 640px) { .triggers-grid { grid-template-columns: 1fr; } }
+
+/* ── Contract: Risk ── */
+.risk-large .value { font-size: 2.2rem; }
+.trend-pill {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.52);
+  font-size: 0.76rem;
+}
+
+/* ── Neg/Compare (kept for compat) ── */
+.neg-slider { accent-color: #e10600; cursor: pointer; }
+.delta-pos { color: #22c55e; font-size: 0.78rem; margin-left: 6px; }
+.delta-neg { color: #e10600; font-size: 0.78rem; margin-left: 6px; }
+.delta-neu { color: rgba(255,255,255,0.4); font-size: 0.78rem; margin-left: 6px; }
+
+/* ══════════════════════════════
+   LIGHT MODE
+══════════════════════════════ */
+body.light-mode {
+  background: #f4f4f7;
+  color: #111;
+}
+body.light-mode .sidebar {
+  background: #f0f0f0 !important;
+  border-right-color: rgba(0,0,0,0.1);
+}
+body.light-mode .sidebar-driver { color: #111; }
+body.light-mode .sidebar-team { color: rgba(0,0,0,0.55); }
+body.light-mode .nav-link { color: rgba(0,0,0,0.6); }
+body.light-mode .nav-link:hover { color: #111; background: rgba(0,0,0,0.06); }
+body.light-mode .nav-link.active { color: #111; background: rgba(0,0,0,0.08); }
+body.light-mode .btn-theme-toggle {
+  background: rgba(0,0,0,0.07);
+  border-color: rgba(0,0,0,0.15);
+  color: rgba(0,0,0,0.7);
+}
+body.light-mode .btn-theme-toggle:hover { background: rgba(0,0,0,0.12); color: #111; }
+body.light-mode .btn-offers {
+  background: rgba(0,0,0,0.07);
+  border-color: rgba(0,0,0,0.15);
+  color: #111;
+}
+body.light-mode .main { /* no bg change needed, inherited from body */ }
+body.light-mode .card {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #111 !important;
+}
+body.light-mode .fin-card {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+  color: #111 !important;
+}
+body.light-mode .hero {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+body.light-mode .hero-name { color: #111; }
+body.light-mode .hero-meta { color: rgba(0,0,0,0.55); }
+body.light-mode .hero-number { color: #000; }
+body.light-mode .prog-panel {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+body.light-mode .prog-metric {
+  background: rgba(0,0,0,0.03) !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}
+body.light-mode .trigger-card {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+body.light-mode .trigger-title { color: rgba(0,0,0,0.82); }
+body.light-mode .trigger-note { color: rgba(0,0,0,0.45); }
+body.light-mode .timeline-wrap {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+body.light-mode .timeline::before { background: rgba(0,0,0,0.12); }
+body.light-mode .timeline-dot { background: #fff; }
+body.light-mode .timeline-year { color: #111; }
+body.light-mode .timeline-label { color: rgba(0,0,0,0.5); }
+body.light-mode .timeline-note { color: rgba(0,0,0,0.38); }
+body.light-mode .salary-panel {
+  background: #fff !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+body.light-mode .salary-panel-title { color: rgba(0,0,0,0.65); }
+body.light-mode .salary-legend-item { color: rgba(0,0,0,0.65); }
+body.light-mode .salary-bar-track { background: rgba(0,0,0,0.07); }
+body.light-mode .salary-chart-box {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.08);
+}
+body.light-mode .context-card {
+  background: rgba(230,232,240,0.85) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+body.light-mode .context-card .value { color: #111; }
+body.light-mode .context-card .note { color: rgba(0,0,0,0.45); }
+body.light-mode .section-line { background: rgba(0,0,0,0.12); }
+body.light-mode .section-title { color: #111; }
+body.light-mode .label { color: rgba(0,0,0,0.5); }
+body.light-mode .value { color: #111; }
+body.light-mode .value-sm { color: #111; }
+body.light-mode .value-md { color: #111; }
+body.light-mode .note { color: rgba(0,0,0,0.45); }
+body.light-mode .chart-title { color: rgba(0,0,0,0.65); }
+body.light-mode .prog-footnote { color: rgba(0,0,0,0.4); }
+body.light-mode .progress-track { background: rgba(0,0,0,0.1); }
+body.light-mode .progress-bar-wrap { background: rgba(0,0,0,0.1); }
+body.light-mode .gold { color: #7a6a2a; }
+body.light-mode .value-gold { color: #7a6a2a; }
+body.light-mode .trend-pill {
+  border-color: rgba(0,0,0,0.15);
+  color: rgba(0,0,0,0.55);
+}
+body.light-mode .toast {
+  background: #fff;
+  border-color: rgba(0,0,0,0.12);
+  color: #111;
+}
+body.light-mode .loading-screen { background: #f4f4f7; }
+body.light-mode .info-icon {
+  background: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.5);
+}
+body.light-mode .info-icon::after {
+  background: #fff;
+  border-color: rgba(0,0,0,0.15);
+  color: #111;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+body.light-mode .fin-card .label { color: rgba(0,0,0,0.5); }
+body.light-mode .fin-card .value { color: #111; }
+body.light-mode .fin-card .note { color: rgba(0,0,0,0.45); }
+body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 20px 16px 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-dots">
+    <span class="loading-dot"></span>
+    <span class="loading-dot"></span>
+    <span class="loading-dot"></span>
+  </div>
+  <div class="loading-text">Loading telemetry…</div>
+</div>
+
+<div class="top-bar" id="topBar"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+<div class="toast" id="toast"></div>
+
+<div class="layout" id="layout" style="visibility:hidden">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-driver" id="sidebarDriver">—</div>
+      <div class="sidebar-team" id="sidebarTeam">—</div>
+      <div class="sidebar-accent-bar" id="sidebarBar"></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-link active" data-target="section-overview">
+        <span class="nav-icon">◈</span> Overview
+      </div>
+      <div class="nav-link" data-target="section-financials">
+        <span class="nav-icon">◎</span> Financials
+      </div>
+      <div class="nav-link" data-target="section-contract">
+        <span class="nav-icon">◉</span> Contract
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="btn-theme-toggle" id="themeToggle">
+        <span id="themeIcon">☀</span><span id="themeLabel">Light Mode</span>
+      </button>
+      <a href="new_contract.html" target="_blank" class="btn-offers">Incoming Offers →</a>
+      <button class="btn-logout" id="logoutBtn">Logout</button>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- ══ SECTION 1: OVERVIEW ══ -->
+    <section class="section active" id="section-overview">
+      <div class="section-header">
+        <div class="section-accent" id="accentOv"></div>
+        <span class="section-title">Overview</span>
+        <span class="section-line"></span>
+      </div>
+
+      <div class="hero" id="hero">
+        <div class="hero-avatar" id="heroAvatar">🏎</div>
+        <div class="hero-info">
+          <div class="hero-name" id="heroName">—</div>
+          <div class="hero-meta" id="heroMeta">—</div>
+          <div class="status-badge" id="heroStatus">Active</div>
+        </div>
+        <div class="hero-number" id="heroNumber">00</div>
+      </div>
+
+      <div class="grid-4">
+        <div class="card">
+          <div class="label">Base Salary <span class="info-icon" data-tip="Annual guaranteed salary from contract">i</span></div>
+          <div class="value gold" id="statSalary">—</div>
+          <div class="note" id="statSalaryNote">—</div>
+        </div>
+        <div class="card">
+          <div class="label">Contract Ends <span class="info-icon" data-tip="Year when the current contract expires">i</span></div>
+          <div class="value" id="statContractEnd">—</div>
+          <div class="note" id="statContractNote">—</div>
+        </div>
+        <div class="card">
+          <div class="label">Dev Index <span class="info-icon" data-tip="Team R&D capability rating from performance data">i</span></div>
+          <div class="value" id="statDevIndex">—</div>
+          <div class="note">Team development score</div>
+        </div>
+        <div class="card">
+          <div class="label">Reliability <span class="info-icon" data-tip="Team reliability score based on race finish data">i</span></div>
+          <div class="value" id="statReliability">—</div>
+          <div class="note">Team reliability score</div>
+        </div>
+      </div>
+
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentCareer"></div>
+        <span class="section-title" style="font-size:1.1rem">Career Stats</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="grid-4" id="careerStatsGrid"><!-- filled dynamically --></div>
+    </section>
+
+    <!-- ══ SECTION 2: FINANCIALS ══ -->
+    <section class="section" id="section-financials">
+      <div class="section-header">
+        <div class="section-accent" id="accentFin"></div>
+        <span class="section-title">Financials</span>
+        <span class="section-line"></span>
+      </div>
+
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentFinVal"></div>
+        <span class="section-title" style="font-size:1.05rem">Contract Valuation</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="fin-grid-5">
+        <div class="fin-card">
+          <div class="label">Duration <span class="info-icon" data-tip="Contract length (end year minus start year)">i</span></div>
+          <div class="value" id="finDuration">—</div>
+          <div class="note" id="finDurationNote">—</div>
+        </div>
+        <div class="fin-card">
+          <div class="label">Base Salary <span class="info-icon" data-tip="Annual guaranteed base salary">i</span></div>
+          <div class="value gold" id="finBaseSalary">—</div>
+          <div class="note">Annual</div>
+        </div>
+        <div class="fin-card">
+          <div class="label">Bonus Potential <span class="info-icon" data-tip="Maximum annual performance bonus (estimated)">i</span></div>
+          <div class="value" id="finBonusPot">—</div>
+          <div class="note">Per season max</div>
+        </div>
+        <div class="fin-card">
+          <div class="label">Total Potential Value <span class="info-icon" data-tip="Max salary + bonuses across full contract term">i</span></div>
+          <div class="value gold" id="finTotalPot">—</div>
+          <div class="note" id="finTotalPotNote">Over contract term</div>
+        </div>
+        <div class="fin-card">
+          <div class="label">Contract Estimate <span class="info-icon" data-tip="Guaranteed base salary over full contract term">i</span></div>
+          <div class="value" id="finContractEst">—</div>
+          <div class="note">Base guarantee</div>
+        </div>
+      </div>
+
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentFinSal"></div>
+        <span class="section-title" style="font-size:1.05rem">Salary Structure Breakdown</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="salary-panel">
+        <div class="salary-panel-title">Annual Income Structure</div>
+        <div class="salary-bar-track">
+          <div class="salary-seg base" id="salSegBase"></div>
+          <div class="salary-seg bonus" id="salSegBonus"></div>
+          <div class="salary-seg endo" id="salSegEndo"></div>
+        </div>
+        <div class="salary-legend">
+          <div class="salary-legend-item"><div class="legend-dot" style="background:#e10600"></div><span id="legBaseLabel">Base Salary — $0</span></div>
+          <div class="salary-legend-item"><div class="legend-dot" style="background:#b8aa76"></div><span id="legBonusLabel">Performance Bonus — $0</span></div>
+          <div class="salary-legend-item"><div class="legend-dot" style="background:#22c55e"></div><span id="legEndoLabel">Endorsements — $0</span></div>
+        </div>
+        <div class="salary-charts-row">
+          <div class="salary-chart-box">
+            <div class="chart-title">Salary Breakdown</div>
+            <canvas id="chartBar"></canvas>
+          </div>
+          <div class="salary-chart-box">
+            <div class="chart-title">Income Distribution</div>
+            <canvas id="chartDoughnut"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentFinPerf"></div>
+        <span class="section-title" style="font-size:1.05rem">Performance-to-Salary Analytics</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="fin-grid-5">
+        <div class="fin-card">
+          <div class="label">Cost per Point <span class="info-icon" data-tip="Annual salary divided by career total points">i</span></div>
+          <div class="value" id="analCostPoint">—</div>
+          <div class="note" id="analCostPointNote">—</div>
+        </div>
+        <div class="fin-card">
+          <div class="label">Cost per Podium <span class="info-icon" data-tip="Annual salary divided by career total podiums">i</span></div>
+          <div class="value" id="analCostPodium">—</div>
+          <div class="note" id="analCostPodiumNote">—</div>
+        </div>
+        <div class="fin-card">
+          <div class="label">Cost per Pole <span class="info-icon" data-tip="Annual salary divided by career pole positions">i</span></div>
+          <div class="value" id="analCostPole">—</div>
+          <div class="note" id="analCostPoleNote">—</div>
+        </div>
+        <div class="fin-card">
+          <div class="label">Salary vs Team Opex <span class="info-icon" data-tip="Driver salary as % of team annual budget">i</span></div>
+          <div class="value" id="analSalaryOpex">—</div>
+          <div class="note" id="analSalaryOpexNote">—</div>
+        </div>
+        <div class="fin-card">
+          <div class="label">Performance Value Index <span class="info-icon" data-tip="Career wins per $1M of annual salary">i</span></div>
+          <div class="value gold" id="analPVI">—</div>
+          <div class="note">Wins per $M salary</div>
+        </div>
+      </div>
+
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentFinCtx"></div>
+        <span class="section-title" style="font-size:1.05rem">Limited Team Context</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="grid-3">
+        <div class="context-card">
+          <div class="label">Team Operating Spend <span class="info-icon" data-tip="Team's total reported annual budget">i</span></div>
+          <div class="value gold" id="ctxOpex">—</div>
+          <div class="note">Annual budget</div>
+        </div>
+        <div class="context-card">
+          <div class="label">Budget Cap Utilization <span class="info-icon" data-tip="Salary cap used as % of total team budget">i</span></div>
+          <div class="value" id="ctxBudgetUtil">—</div>
+          <div class="note" id="ctxBudgetUtilNote">—</div>
+        </div>
+        <div class="context-card">
+          <div class="label">Salary Share <span class="info-icon" data-tip="Driver salary as % of salary cap allocation">i</span></div>
+          <div class="value" id="ctxSalaryShare">—</div>
+          <div class="note" id="ctxSalaryShareNote">Of salary cap allocation</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 3: CONTRACT ══ -->
+    <section class="section" id="section-contract">
+      <div class="section-header">
+        <div class="section-accent" id="accentCnt"></div>
+        <span class="section-title">Contract</span>
+        <span class="section-line"></span>
+      </div>
+
+      <!-- CONTRACT SNAPSHOT -->
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentCntSnap"></div>
+        <span class="section-title" style="font-size:1.05rem">Contract Snapshot</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="grid-4">
+        <div class="card">
+          <p class="label-ac">Contract Start <span class="info-icon" data-tip="First year of the current contract">i</span></p>
+          <p class="value" id="snapStart">—</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Contract End <span class="info-icon" data-tip="Final year of the current contract">i</span></p>
+          <p class="value" id="snapEnd">—</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Contract Length <span class="info-icon" data-tip="Duration: end year minus start year">i</span></p>
+          <p class="value" id="snapDuration">—</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Contract Status <span class="info-icon" data-tip="Current state of the contract">i</span></p>
+          <p class="value" id="snapStatus">—</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Base Salary <span class="info-icon" data-tip="Annual guaranteed salary from contract">i</span></p>
+          <p class="value value-gold" id="snapSalary">—</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Bonus Potential <span class="info-icon" data-tip="Annual maximum performance bonus ceiling">i</span></p>
+          <p class="value" id="snapBonus">—</p>
+          <p class="note">Annual performance ceiling</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Total Potential Value <span class="info-icon" data-tip="Estimated maximum value over full contract term">i</span></p>
+          <p class="value value-gold" id="snapTotal">—</p>
+          <p class="note">Estimated full-term potential</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Buyout / Release Clause <span class="info-icon" data-tip="Fee required for early contract termination">i</span></p>
+          <p class="value" id="snapRelease">—</p>
+        </div>
+      </div>
+
+      <!-- CONTRACT PROGRESSION -->
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentCntProg"></div>
+        <span class="section-title" style="font-size:1.05rem">Contract Progression Status</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="prog-panel">
+        <div class="prog-meta">
+          <div class="prog-metric">
+            <p class="label">Years Completed <span class="info-icon" data-tip="Seasons completed out of total contract seasons">i</span></p>
+            <p class="value" id="progYears">— / —</p>
+          </div>
+          <div class="prog-metric">
+            <p class="label">Time Remaining <span class="info-icon" data-tip="Seasons left before contract expires">i</span></p>
+            <p class="value-md" id="progRemaining">—</p>
+          </div>
+          <div class="prog-metric">
+            <p class="label">Fulfillment <span class="info-icon" data-tip="Percentage of contract duration completed">i</span></p>
+            <p class="value" id="progPct">—%</p>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progBar" style="width:0%"></div>
+        </div>
+        <p class="prog-footnote" id="progFootnote">Based on contract timeline progression</p>
+      </div>
+
+      <!-- KEY CLAUSES -->
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentCntClause"></div>
+        <span class="section-title" style="font-size:1.05rem">Key Clauses</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="grid-4">
+        <div class="card">
+          <p class="label-ac">Podium Bonus <span class="info-icon" data-tip="Bonus paid per individual podium finish">i</span></p>
+          <p class="value-md value-gold" id="clausePodium">—</p>
+          <p class="note">Per podium finish</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Championship Bonus <span class="info-icon" data-tip="One-off bonus on winning the Drivers' Championship">i</span></p>
+          <p class="value-md value-gold" id="clauseChamp">—</p>
+          <p class="note">On Drivers' Championship win</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Minimum Position Clause <span class="info-icon" data-tip="Required constructors standing to avoid review">i</span></p>
+          <p class="value-md" id="clauseMinPos">—</p>
+          <p class="note">Required constructors standing</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Release Clause <span class="info-icon" data-tip="Buyout fee for early contract termination">i</span></p>
+          <p class="value-md" id="clauseRelease">—</p>
+          <p class="note">Exit / buyout condition</p>
+        </div>
+      </div>
+
+      <!-- PERFORMANCE TRIGGERS -->
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentCntTrig"></div>
+        <span class="section-title" style="font-size:1.05rem">Performance Trigger Status</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="triggers-grid">
+        <div class="trigger-card">
+          <div class="trigger-top">
+            <span class="trigger-title">Podium Rate <span class="info-icon" data-tip="Career podiums as % of total races entered">i</span></span>
+            <span class="trigger-pct" id="trigPodiumPct">—%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="trigPodiumBar" style="width:0%"></div></div>
+          <p class="trigger-note" id="trigPodiumNote">—</p>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-top">
+            <span class="trigger-title">Points Benchmark <span class="info-icon" data-tip="Career points vs minimum season points target">i</span></span>
+            <span class="trigger-pct" id="trigPointsPct">—%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="trigPointsBar" style="width:0%"></div></div>
+          <p class="trigger-note" id="trigPointsNote">—</p>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-top">
+            <span class="trigger-title">Championship Target <span class="info-icon" data-tip="Championship contention probability model">i</span></span>
+            <span class="trigger-pct" id="trigChampPct">—%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="trigChampBar" style="width:0%"></div></div>
+          <p class="trigger-note" id="trigChampNote">—</p>
+        </div>
+        <div class="trigger-card">
+          <div class="trigger-top">
+            <span class="trigger-title">Constructors Bonus Eligibility <span class="info-icon" data-tip="Eligibility based on team's constructors position">i</span></span>
+            <span class="trigger-pct" id="trigConstrPct">—%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="trigConstrBar" style="width:0%"></div></div>
+          <p class="trigger-note" id="trigConstrNote">—</p>
+        </div>
+      </div>
+
+      <!-- RISK PROFILE -->
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentCntRisk"></div>
+        <span class="section-title" style="font-size:1.05rem">Contract Risk Profile</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="grid-3" style="margin-bottom:28px">
+        <div class="card risk-large">
+          <p class="label-ac">Stability Rating <span class="info-icon" data-tip="Composite: performance consistency, team fit, retention">i</span></p>
+          <p class="value value-gold" id="riskStability">—</p>
+          <p class="note">Performance, team fit, strategic retention</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Renewal Probability <span class="info-icon" data-tip="Estimated probability of post-contract extension">i</span></p>
+          <p class="value value-gold" id="riskRenewal">—</p>
+          <p class="note">Preliminary extension estimate</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Market Value Trend <span class="info-icon" data-tip="Direction of driver's current market value">i</span></p>
+          <p class="value" id="riskTrend">—</p>
+          <span class="trend-pill" id="riskPill">—</span>
+        </div>
+      </div>
+
+      <!-- TEAM CONTEXT -->
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentCntCtx"></div>
+        <span class="section-title" style="font-size:1.05rem">Team Context</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <p class="label-ac">Salary as % of Team Spend <span class="info-icon" data-tip="Driver salary as % of team's annual operating budget">i</span></p>
+          <p class="value" id="ctxShare">—</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Salary Rank Within Team <span class="info-icon" data-tip="Driver's salary rank compared to current teammates">i</span></p>
+          <p class="value" id="ctxRank">—</p>
+        </div>
+        <div class="card">
+          <p class="label-ac">Budget Cap Exemption <span class="info-icon" data-tip="Whether driver salary is exempt from the budget cap">i</span></p>
+          <p class="value" id="ctxCap">—</p>
+        </div>
+      </div>
+
+      <!-- CONTRACT TIMELINE -->
+      <div class="section-header mt-8">
+        <div class="section-accent" id="accentCntTime"></div>
+        <span class="section-title" style="font-size:1.05rem">Contract Timeline</span>
+        <span class="section-line"></span>
+      </div>
+      <div class="timeline-wrap">
+        <div class="timeline" id="contractTimeline"><!-- filled dynamically --></div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  var driverId = localStorage.getItem("loggedInDriver");
+  if (!driverId) { location.replace("index.html"); return; }
+
+  // ── Cursor ────────────────────────────────────────────────────────────────
+  var cur = document.getElementById("cursor");
+  var trail = document.getElementById("cursorTrail");
+  var mx = 0, my = 0, tx = 0, ty = 0;
+  document.addEventListener("mousemove", function (e) { mx = e.clientX; my = e.clientY; });
+  (function animCursor() {
+    cur.style.left = mx + "px"; cur.style.top = my + "px";
+    tx += (mx - tx) * 0.12; ty += (my - ty) * 0.12;
+    trail.style.left = tx + "px"; trail.style.top = ty + "px";
+    requestAnimationFrame(animCursor);
+  })();
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  var toastEl = document.getElementById("toast");
+  var toastTimer;
+  function showToast(msg, type) {
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.className = "toast show toast-" + (type || "info");
+    toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 3200);
+  }
+
+  // ── Format helpers ────────────────────────────────────────────────────────
+  function fmt(n) {
+    if (!n && n !== 0) return "N/A";
+    var v = Math.abs(n);
+    if (v >= 1e6) return "$" + (n / 1e6).toFixed(1) + "M";
+    if (v >= 1e3) return "$" + (n / 1e3).toFixed(0) + "K";
+    return "$" + n.toLocaleString();
+  }
+  function cap(n, lo, hi) { return Math.min(hi, Math.max(lo, n)); }
+
+  function calcEndorsements(end) {
+    if (!end) return 0;
+    if (typeof end === "number") return end;
+    if (typeof end === "string") { var n = parseFloat(end.replace(/[^0-9.]/g, "")); return isNaN(n) ? 0 : n; }
+    if (Array.isArray(end)) {
+      return end.reduce(function (s, e) {
+        var v = parseFloat(String(e.value || e.amount || e || "0").replace(/[^0-9.]/g, ""));
+        return s + (isNaN(v) ? 0 : v);
+      }, 0);
+    }
+    return 0;
+  }
+
+  // ── Luminance (for safe sidebar color) ───────────────────────────────────
+  function getLuminance(hex) {
+    if (!hex || !hex.startsWith("#")) return 0;
+    var h = hex.replace("#", "");
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    if (h.length !== 6) return 0;
+    var r = parseInt(h.slice(0,2),16)/255, g = parseInt(h.slice(2,4),16)/255, b = parseInt(h.slice(4,6),16)/255;
+    r = r < 0.04045 ? r/12.92 : Math.pow((r+0.055)/1.055, 2.4);
+    g = g < 0.04045 ? g/12.92 : Math.pow((g+0.055)/1.055, 2.4);
+    b = b < 0.04045 ? b/12.92 : Math.pow((b+0.055)/1.055, 2.4);
+    return 0.2126*r + 0.7152*g + 0.0722*b;
+  }
+
+  function hexAlpha(hex, a) {
+    var h = hex.replace("#","");
+    if (h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    if (h.length!==6) return hex;
+    return "rgba("+parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)+","+a+")";
+  }
+
+  // ── Theme state ───────────────────────────────────────────────────────────
+  var accentColor = "#e10600";
+
+  function applyTheme(team) {
+    if (!team || !team.theme) return;
+    accentColor = team.theme.accent || team.theme.secondary || "#e10600";
+    var primaryColor = team.theme.primary || "#0a0a0a";
+
+    document.getElementById("topBar").style.background =
+      "linear-gradient(90deg," + accentColor + "," + (team.theme.secondary || accentColor) + "," + accentColor + ")";
+    document.getElementById("sidebarBar").style.background = accentColor;
+    document.getElementById("cursor").style.background = accentColor;
+    document.getElementById("cursorTrail").style.borderColor = accentColor;
+
+    // Only apply team primaryColor to sidebar if it's dark enough
+    var lum = getLuminance(primaryColor);
+    document.getElementById("sidebar").style.background = (lum < 0.12) ? primaryColor : "#0a0a0a";
+
+    var isHex = accentColor.startsWith("#");
+    var ac18 = isHex ? hexAlpha(accentColor, 0.18) : accentColor;
+    var ac12 = isHex ? hexAlpha(accentColor, 0.12) : accentColor;
+
+    // Safe text accent: fall back from near-white colors that won't show on dark bg
+    var textAc = (function () {
+      var ac = accentColor, th = team.theme;
+      if (ac.startsWith("#") && getLuminance(ac) > 0.7) {
+        var sec = th.secondary;
+        if (sec && sec.startsWith("#") && getLuminance(sec) <= 0.7) return sec;
+        var pri = th.primary;
+        if (pri && pri.startsWith("#") && getLuminance(pri) >= 0.05 && getLuminance(pri) <= 0.7) return pri;
+        return "#e10600";
+      }
+      return ac;
+    })();
+    var borderAc = hexAlpha(accentColor, 0.5);
+
+    var styleEl = document.getElementById("themeStyle");
+    if (!styleEl) { styleEl = document.createElement("style"); styleEl.id = "themeStyle"; document.head.appendChild(styleEl); }
+    styleEl.textContent =
+      ".card:hover{box-shadow:0 14px 30px " + ac18 + " !important}" +
+      ".card::before{background:radial-gradient(circle at 20% 20%," + ac12 + ",transparent 66%) !important}" +
+      ".fin-card:hover{box-shadow:0 16px 30px " + ac18 + " !important}" +
+      ".fin-card::before{background:radial-gradient(circle at 20% 20%," + ac12 + ",transparent 66%) !important}" +
+      ".nav-link.active{border-left-color:" + accentColor + " !important;color:" + textAc + " !important}" +
+      ".section-accent{background:" + accentColor + " !important}" +
+      ".progress-bar-fill{background:" + accentColor + " !important}" +
+      ".progress-fill{background:" + accentColor + " !important}" +
+      ".trigger-pct{color:" + accentColor + " !important}" +
+      ".label-ac{color:" + accentColor + " !important}" +
+      ".neg-slider{accent-color:" + accentColor + " !important}" +
+      ".salary-seg.base{background:linear-gradient(90deg," + accentColor + "," + accentColor + "cc) !important}" +
+      ".timeline-dot{border-color:" + accentColor + " !important}" +
+      ".timeline-dot.filled{background:" + accentColor + " !important}" +
+      ".hero-name{color:" + textAc + " !important}" +
+      ".sidebar-driver{color:" + textAc + " !important}" +
+      ".section-title{color:" + textAc + " !important}" +
+      ".card{border-left:3px solid " + borderAc + " !important}" +
+      ".fin-card{border-left:3px solid " + borderAc + " !important}" +
+      ".value{color:" + textAc + " !important}";
+  }
+
+  function applyFont(teamId) {
+    var f = "Poppins, sans-serif";
+    if (teamId === "MER01") f = "'Unity Sans', Poppins, sans-serif";
+    else if (teamId === "RB01") f = "'RB Futura', Poppins, sans-serif";
+    document.body.style.fontFamily = f;
+  }
+
+  // ── Light / Dark mode ─────────────────────────────────────────────────────
+  function applyThemeMode(mode) {
+    if (mode === "light") {
+      document.body.classList.add("light-mode");
+      document.getElementById("themeIcon").textContent = "🌙";
+      document.getElementById("themeLabel").textContent = " Dark Mode";
+    } else {
+      document.body.classList.remove("light-mode");
+      document.getElementById("themeIcon").textContent = "☀";
+      document.getElementById("themeLabel").textContent = " Light Mode";
+    }
+  }
+  var savedTheme = localStorage.getItem("themeMode") || "dark";
+  applyThemeMode(savedTheme);
+  document.getElementById("themeToggle").addEventListener("click", function () {
+    var next = document.body.classList.contains("light-mode") ? "dark" : "light";
+    localStorage.setItem("themeMode", next);
+    applyThemeMode(next);
+  });
+
+  // ── Sidebar ───────────────────────────────────────────────────────────────
+  function fillSidebar(driver, team) {
+    document.getElementById("sidebarDriver").textContent = driver.personalDetails.fullName || "Driver";
+    document.getElementById("sidebarTeam").textContent = team ? team.teamName : (driver.personalDetails.currentTeam || "—");
+    document.title = "F1 Dashboard — " + (driver.personalDetails.fullName || "Driver");
+  }
+
+  // ── Overview ──────────────────────────────────────────────────────────────
+  function fillOverview(driver, team) {
+    var pd = driver.personalDetails, cs = driver.careerStats;
+    var fin = driver.financials,     ctr = driver.contract;
+
+    document.getElementById("heroName").textContent = pd.fullName || "—";
+    document.getElementById("heroNumber").textContent = "#" + (pd.driverNumber || "00");
+    var debutStr = "";
+    if (pd.f1Debut) {
+      debutStr = "  ·  F1 debut " + (pd.f1Debut.year || "") + (pd.f1Debut.team ? " (" + pd.f1Debut.team + ")" : "");
+    }
+    document.getElementById("heroMeta").textContent = (pd.birthplace || "") + debutStr;
+    document.getElementById("heroAvatar").textContent = pd.driverNumber ? "#" + pd.driverNumber : "🏎";
+    document.getElementById("heroStatus").textContent = (ctr && ctr.status) ? ctr.status.toUpperCase() : "ACTIVE";
+
+    var salary = (fin && fin.annualSalary) || (ctr && ctr.baseSalary) || 0;
+    document.getElementById("statSalary").textContent = fmt(salary);
+    document.getElementById("statSalaryNote").textContent = "Annual base salary";
+    if (ctr && ctr.endDate) {
+      document.getElementById("statContractEnd").textContent = ctr.endDate.substring(0, 4);
+      document.getElementById("statContractNote").textContent = "Contract end year";
+    }
+    if (team && team.performance) {
+      document.getElementById("statDevIndex").textContent = (team.performance.developmentIndex || "—") + " / 10";
+      document.getElementById("statReliability").textContent = (team.performance.reliabilityScore || "—") + " / 10";
+    }
+
+    var tips = {
+      "Grand Prix":     "Total Formula 1 races entered",
+      "Career Points":  "Total championship points scored in career",
+      "Podiums":        "Career top-3 race finishes",
+      "Wins":           "Total career race victories",
+      "Pole Positions": "Times starting from pole position",
+      "Championships":  "World Drivers' Championship titles won",
+      "Highest Finish": "Best single-race finishing position",
+      "Pole-Win Ratio": "Race wins converted from pole position"
+    };
+    var stats = [
+      { label: "Grand Prix",     value: cs.grandPrixEntered || 0 },
+      { label: "Career Points",  value: cs.careerPoints || 0 },
+      { label: "Podiums",        value: cs.podiums || 0 },
+      { label: "Wins",           value: cs.wins || 0 },
+      { label: "Pole Positions", value: cs.polePositions || 0 },
+      { label: "Championships",  value: cs.worldChampionships || 0 },
+      { label: "Highest Finish", value: "P" + (cs.highestRaceFinish || "—") },
+      { label: "Pole-Win Ratio", value: cs.poleWinRatio ? (cs.poleWinRatio * 100).toFixed(0) + "%" : "—" }
+    ];
+    document.getElementById("careerStatsGrid").innerHTML = stats.map(function (s) {
+      return '<div class="card"><div class="label">' + s.label +
+        ' <span class="info-icon" data-tip="' + tips[s.label] + '">i</span></div>' +
+        '<div class="value-sm">' + s.value + '</div></div>';
+    }).join("");
+  }
+
+  // ── Financials ────────────────────────────────────────────────────────────
+  var finChartsBuilt = false;
+  function fillFinancials(driver, team) {
+    var fin = driver.financials, cs = driver.careerStats, ctr = driver.contract;
+    var salary     = (fin && fin.annualSalary) || (ctr && ctr.baseSalary) || 0;
+    var perWin     = (fin && fin.performanceBonus && fin.performanceBonus.perWin) || 0;
+    var perPod     = (fin && fin.performanceBonus && fin.performanceBonus.perPodium) || 0;
+    var champBonus = (fin && fin.performanceBonus && fin.performanceBonus.championshipBonus) || 0;
+    var endorsements = calcEndorsements(fin && fin.endorsements);
+
+    var startYear = 0, endYear = 0, durationYrs = 0;
+    if (ctr && ctr.startDate) startYear = parseInt(ctr.startDate.substring(0,4));
+    if (ctr && ctr.endDate)   endYear   = parseInt(ctr.endDate.substring(0,4));
+    if (startYear && endYear) durationYrs = endYear - startYear;
+
+    var durLabel = durationYrs ? durationYrs + " yrs" : "—";
+    if (startYear && endYear) durLabel += " (" + startYear + "–" + endYear + ")";
+    document.getElementById("finDuration").textContent = durLabel;
+    document.getElementById("finDurationNote").textContent = (startYear && endYear) ? startYear + " – " + endYear : "—";
+    document.getElementById("finBaseSalary").textContent = fmt(salary);
+
+    var bonusPotential = perWin * 3 + perPod * 8 + champBonus;
+    document.getElementById("finBonusPot").textContent = fmt(bonusPotential);
+
+    var totalPot = (salary + bonusPotential) * durationYrs;
+    document.getElementById("finTotalPot").textContent = totalPot ? fmt(totalPot) : "—";
+    document.getElementById("finTotalPotNote").textContent = durationYrs ? durationYrs + "-yr total potential" : "Over contract term";
+
+    document.getElementById("finContractEst").textContent = (salary * durationYrs) ? fmt(salary * durationYrs) : "—";
+
+    var annualBonus = perWin * 3 + perPod * 8;
+    var totalIncome = Math.max(salary + annualBonus + endorsements, 1);
+    document.getElementById("legBaseLabel").textContent  = "Base Salary — " + fmt(salary);
+    document.getElementById("legBonusLabel").textContent = "Performance Bonus — " + fmt(annualBonus);
+    document.getElementById("legEndoLabel").textContent  = "Endorsements — " + (endorsements ? fmt(endorsements) : "Undisclosed");
+    setTimeout(function () {
+      document.getElementById("salSegBase").style.width  = (salary / totalIncome * 100).toFixed(2) + "%";
+      document.getElementById("salSegBonus").style.width = (annualBonus / totalIncome * 100).toFixed(2) + "%";
+      document.getElementById("salSegEndo").style.width  = (endorsements / totalIncome * 100).toFixed(2) + "%";
+      document.getElementById("salSegBase").style.transform  = "scaleX(1)";
+      document.getElementById("salSegBonus").style.transform = "scaleX(1)";
+      document.getElementById("salSegEndo").style.transform  = "scaleX(1)";
+    }, 150);
+
+    // Analytics — always use annualSalary
+    var wins    = Math.max(cs.wins || 0, 1);
+    var podiums = Math.max(cs.podiums || 0, 1);
+    var poles   = Math.max(cs.polePositions || 0, 1);
+    var points  = Math.max(cs.careerPoints || 0, 1);
+    document.getElementById("analCostPoint").textContent    = fmt(salary / points);
+    document.getElementById("analCostPointNote").textContent  = (cs.careerPoints || 0).toLocaleString() + " career pts";
+    document.getElementById("analCostPodium").textContent   = fmt(salary / podiums);
+    document.getElementById("analCostPodiumNote").textContent = (cs.podiums || 0) + " career podiums";
+    document.getElementById("analCostPole").textContent     = fmt(salary / poles);
+    document.getElementById("analCostPoleNote").textContent   = (cs.polePositions || 0) + " career poles";
+
+    if (team && team.financial && team.financial.annualBudget) {
+      var opex = team.financial.annualBudget;
+      document.getElementById("analSalaryOpex").textContent = (salary / opex * 100).toFixed(1) + "%";
+      document.getElementById("analSalaryOpexNote").textContent = "of " + fmt(opex) + " budget";
+    } else {
+      document.getElementById("analSalaryOpex").textContent = "—";
+      document.getElementById("analSalaryOpexNote").textContent = "Team data unavailable";
+    }
+    document.getElementById("analPVI").textContent = salary > 0 ? ((cs.wins || 0) / (salary / 1e6)).toFixed(2) : "—";
+
+    if (team && team.financial) {
+      var tf = team.financial;
+      document.getElementById("ctxOpex").textContent = fmt(tf.annualBudget || 0);
+      document.getElementById("ctxBudgetUtil").textContent = tf.annualBudget ? ((tf.salaryCapAllocation || 0) / tf.annualBudget * 100).toFixed(1) + "%" : "—";
+      document.getElementById("ctxBudgetUtilNote").textContent = fmt(tf.salaryCapAllocation || 0) + " salary cap";
+      document.getElementById("ctxSalaryShare").textContent = tf.salaryCapAllocation ? (salary / tf.salaryCapAllocation * 100).toFixed(1) + "%" : "—";
+      document.getElementById("ctxSalaryShareNote").textContent = fmt(salary) + " of " + fmt(tf.salaryCapAllocation || 0) + " cap";
+    } else {
+      ["ctxOpex","ctxBudgetUtil","ctxSalaryShare"].forEach(function(id){ document.getElementById(id).textContent = "—"; });
+      document.getElementById("ctxBudgetUtilNote").textContent = "Team data unavailable";
+      document.getElementById("ctxSalaryShareNote").textContent = "Team data unavailable";
+    }
+
+    if (!finChartsBuilt) {
+      finChartsBuilt = true;
+      buildFinCharts(salary, perWin, perPod, champBonus, endorsements);
+    }
+  }
+
+  function buildFinCharts(salary, perWin, perPod, champBonus, endorsements) {
+    new Chart(document.getElementById("chartBar").getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: ["Base Salary","Per Win","Per Podium","Champ Bonus"],
+        datasets: [{ data: [salary,perWin,perPod,champBonus],
+          backgroundColor: [accentColor+"cc",accentColor+"88",accentColor+"66",accentColor+"44"],
+          borderRadius: 6, borderSkipped: false }]
+      },
+      options: { responsive:true, plugins:{legend:{display:false}},
+        scales: {
+          x:{ticks:{color:"rgba(255,255,255,0.5)",font:{family:"Poppins",size:11}},grid:{color:"rgba(255,255,255,0.05)"}},
+          y:{ticks:{color:"rgba(255,255,255,0.5)",font:{family:"Poppins",size:11},callback:function(v){return"$"+(v/1e6).toFixed(1)+"M";}},grid:{color:"rgba(255,255,255,0.05)"}}
+        }
+      }
+    });
+    var dD=[salary], dL=["Base Salary"], dC=[accentColor];
+    if(perWin>0)       {dD.push(perWin);       dL.push("Per Win");      dC.push("#b8aa76");}
+    if(perPod>0)       {dD.push(perPod);       dL.push("Per Podium");   dC.push("#60a5fa");}
+    if(champBonus>0)   {dD.push(champBonus);   dL.push("Champ Bonus");  dC.push("#f59e0b");}
+    if(endorsements>0) {dD.push(endorsements); dL.push("Endorsements"); dC.push("#22c55e");}
+    new Chart(document.getElementById("chartDoughnut").getContext("2d"), {
+      type: "doughnut",
+      data: { labels:dL, datasets:[{data:dD,backgroundColor:dC,borderWidth:0,hoverOffset:8}] },
+      options: { responsive:true, plugins:{legend:{position:"bottom",labels:{color:"rgba(255,255,255,0.6)",font:{family:"Poppins",size:11},padding:16}}}, cutout:"62%" }
+    });
+  }
+
+  // ── Contract helpers ──────────────────────────────────────────────────────
+  function calcTriggers(driver) {
+    var cs = driver.careerStats;
+    var gps = cs.grandPrixEntered || 1, pods = cs.podiums || 0;
+    var pts = cs.careerPoints || 0, chmp = cs.worldChampionships || 0;
+    var minPts = (driver.contract.performanceClauses && driver.contract.performanceClauses.minimumPoints) || 200;
+    var minPos = (driver.contract.performanceClauses && driver.contract.performanceClauses.minimumPosition) || 5;
+    var podRate = cap(Math.round((pods/gps)*100),0,100);
+    var ptsBench = cap(Math.round((pts/Math.max(gps*18,1))*100),0,100);
+    var champTarget = chmp>0 ? cap(55+chmp*14,0,96) : cap(Math.round((pods/gps)*220),0,88);
+    var constrElig = cap(Math.round(58+podRate*0.38),0,96);
+    return {
+      podium:       {percent:podRate,     note:pods+" podiums across "+gps+" GPs entered"},
+      points:       {percent:ptsBench,    note:Math.round(pts)+" career points · "+minPts+" season minimum"},
+      championship: {percent:champTarget, note:chmp+" championship(s) · contention probability model"},
+      constructors: {percent:constrElig,  note:"Top-"+minPos+" constructors threshold tracking"}
+    };
+  }
+
+  function calcRisk(driver) {
+    var cs = driver.careerStats;
+    var gps = cs.grandPrixEntered || 1;
+    var rate = (cs.podiums||0)/gps;
+    var stab = Math.min(9.9, 3.5+rate*10+(cs.worldChampionships||0)*0.6).toFixed(1);
+    var renew = cap(Math.round(38+rate*130+(cs.worldChampionships||0)*5),30,95);
+    var trend = rate>0.32?"Upward":rate>0.14?"Stable":"Downward";
+    var pill = trend==="Upward"?"Strong contract leverage":trend==="Stable"?"Stable contract leverage":"Under market pressure";
+    return {stabilityRating:stab, renewalProbability:renew, marketValueTrend:trend, trendPill:pill};
+  }
+
+  // ── Contract section ──────────────────────────────────────────────────────
+  function fillContract(driver, team, allDrivers) {
+    var c  = driver.contract, f = driver.financials;
+    var cs = driver.careerStats, pd = driver.personalDetails;
+    var cd = driver.uiData && driver.uiData.contractDashboard;
+
+    var startYr = c.startDate ? parseInt(c.startDate.slice(0,4)) : null;
+    var endYr   = c.endDate   ? parseInt(c.endDate.slice(0,4))   : null;
+    var durNum  = (startYr && endYr) ? (endYr - startYr) : 0;
+
+    var salary = (f && f.annualSalary) || (c && c.baseSalary) || 0;
+    var pb = (f && f.performanceBonus) || {};
+    var bonusPotential = cd ? cd.bonusPotential : ((pb.perWin||0)*8 + (pb.perPodium||0)*12);
+    var totalPotential = cd ? cd.totalPotentialValue : (salary * durNum + bonusPotential * durNum);
+    var totalDuration  = cd ? cd.totalDurationYears  : durNum;
+
+    // Snapshot
+    document.getElementById("snapStart").textContent   = startYr || "—";
+    document.getElementById("snapEnd").textContent     = endYr   || "—";
+    var durLabel = totalDuration ? totalDuration + (totalDuration===1?" Yr":" Yrs") : "—";
+    if (startYr && endYr) durLabel += " (" + startYr + "–" + endYr + ")";
+    document.getElementById("snapDuration").textContent = durLabel;
+    document.getElementById("snapStatus").textContent   = c.status ? c.status.charAt(0).toUpperCase()+c.status.slice(1) : "—";
+    document.getElementById("snapSalary").textContent   = fmt(salary);
+    document.getElementById("snapBonus").textContent    = "Up to " + fmt(bonusPotential);
+    document.getElementById("snapTotal").textContent    = "~" + fmt(totalPotential);
+    document.getElementById("snapRelease").textContent  = fmt(c.releaseClause);
+
+    // Progression
+    var YEAR = new Date().getFullYear();
+    var prog = cd && cd.progression;
+    var yrsCompleted = prog ? prog.yearsCompleted : Math.max(0, YEAR - (startYr||YEAR));
+    var yrsTotal     = prog ? prog.yearsTotal     : (durNum||1);
+    var fulfillPct   = prog ? prog.fulfillmentPercent : cap(Math.round((yrsCompleted/yrsTotal)*100),0,100);
+    var timeRemain   = prog ? prog.timeRemainingLabel : (Math.max(0,(endYr||YEAR)-YEAR)+" Season(s)");
+    document.getElementById("progYears").textContent     = yrsCompleted + " / " + yrsTotal;
+    document.getElementById("progRemaining").textContent = timeRemain;
+    document.getElementById("progPct").textContent       = fulfillPct + "%";
+    document.getElementById("progBar").style.width       = cap(fulfillPct,0,100) + "%";
+
+    // Key clauses
+    var minPos = (c.performanceClauses && c.performanceClauses.minimumPosition) || "—";
+    document.getElementById("clausePodium").textContent  = fmt(pb.perPodium || 0);
+    document.getElementById("clauseChamp").textContent   = fmt(pb.championshipBonus || 0);
+    document.getElementById("clauseMinPos").textContent  = "Top-" + minPos + " Constructors";
+    document.getElementById("clauseRelease").textContent = fmt(c.releaseClause);
+
+    // Triggers
+    var trig = (cd && cd.triggers) || calcTriggers(driver);
+    [
+      ["trigPodiumPct","trigPodiumBar","trigPodiumNote", trig.podium],
+      ["trigPointsPct","trigPointsBar","trigPointsNote", trig.points],
+      ["trigChampPct", "trigChampBar", "trigChampNote",  trig.championship],
+      ["trigConstrPct","trigConstrBar","trigConstrNote",  trig.constructors]
+    ].forEach(function(row) {
+      document.getElementById(row[0]).textContent = row[3].percent + "%";
+      document.getElementById(row[1]).style.width = cap(row[3].percent,0,100) + "%";
+      document.getElementById(row[2]).textContent = row[3].note;
+    });
+
+    // Risk
+    var risk = (cd && cd.risk) || calcRisk(driver);
+    document.getElementById("riskStability").textContent = risk.stabilityRating + " / 10";
+    document.getElementById("riskRenewal").textContent   = cap(risk.renewalProbability,0,100) + "%";
+    document.getElementById("riskTrend").textContent     = risk.marketValueTrend;
+    document.getElementById("riskPill").textContent      = risk.trendPill;
+
+    // Team context
+    var budget = (team && team.financial && team.financial.annualBudget) || 500000000;
+    document.getElementById("ctxShare").textContent = ((salary/budget)*100).toFixed(1) + "%";
+
+    // Salary rank — compare with real teammates
+    var teamId   = c && c.teamId;
+    var teamName = c && c.team;
+    var teammates = (allDrivers||[]).filter(function(d) {
+      if (d.driverId === driver.driverId) return false;
+      var dTId = d.contract && d.contract.teamId;
+      var dTNm = d.contract && d.contract.team;
+      return (teamId && dTId === teamId) || (!teamId && teamName && dTNm === teamName);
+    });
+    var allSals = [salary].concat(teammates.map(function(d){
+      return (d.financials&&d.financials.annualSalary)||(d.contract&&d.contract.baseSalary)||0;
+    }));
+    allSals.sort(function(a,b){return b-a;});
+    var rank = allSals.indexOf(salary) + 1;
+    document.getElementById("ctxRank").textContent = "#" + Math.max(1,rank) + " of " + allSals.length;
+    document.getElementById("ctxCap").textContent  = (cd && cd.teamContext && cd.teamContext.budgetCapExemptionStatus) || "Exempt";
+
+    // Timeline
+    var debutYear = pd.f1Debut && pd.f1Debut.year;
+    var debutTeam = pd.f1Debut && pd.f1Debut.team;
+    var ctrTeam   = (c.team) || (team ? team.teamName : "");
+    var today     = new Date().getFullYear();
+    var items = [];
+    if (debutYear) items.push({year:debutYear, label:"F1 Debut", note:debutTeam, filled:true});
+    if (startYr)   items.push({year:startYr,   label:"Joined Team / Contract Start", note:ctrTeam, filled:startYr<=today});
+    if (endYr)     items.push({year:endYr,     label:"Contract End", note:"Season "+endYr, filled:endYr<=today});
+    document.getElementById("contractTimeline").innerHTML = items.map(function(item){
+      return '<div class="timeline-item">' +
+        '<div class="timeline-dot'+(item.filled?" filled":"")+'">●</div>' +
+        '<div class="timeline-content">' +
+          '<div class="timeline-year">'+item.year+'</div>' +
+          '<div class="timeline-label">'+item.label+'</div>' +
+          (item.note?'<div class="timeline-note">'+item.note+'</div>':'') +
+        '</div></div>';
+    }).join("");
+  }
+
+  // ── Nav wiring ────────────────────────────────────────────────────────────
+  function wireNav() {
+    document.querySelectorAll(".nav-link[data-target]").forEach(function (link) {
+      link.addEventListener("click", function () {
+        var target = this.dataset.target;
+        document.querySelectorAll(".nav-link").forEach(function (l) {
+          l.classList.remove("active"); l.style.borderLeftColor = "";
+        });
+        this.classList.add("active");
+        this.style.borderLeftColor = accentColor;
+        document.querySelectorAll(".section").forEach(function (s) { s.classList.remove("active"); });
+        var el = document.getElementById(target);
+        if (el) el.classList.add("active");
+      });
+    });
+  }
+
+  function wireLogout() {
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      localStorage.removeItem("loggedInDriver");
+      location.replace("index.html");
+    });
+  }
+
+  // ── Resolve team ──────────────────────────────────────────────────────────
+  function resolveTeam(driver, allTeams) {
+    var teamId = driver.contract && driver.contract.teamId;
+    if (teamId) {
+      var t = allTeams.find(function(t){ return t.teamId === teamId; });
+      if (t) return t;
+    }
+    var ct = driver.personalDetails.currentTeam || "";
+    var t2 = allTeams.find(function(t){ return t.shortName===ct||t.teamName.includes(ct)||ct.includes(t.shortName); });
+    if (t2) return t2;
+    var ctName = driver.contract && driver.contract.team;
+    if (ctName) {
+      var t3 = allTeams.find(function(t){ return t.teamName.includes(ctName)||ctName.includes(t.shortName); });
+      if (t3) return t3;
+    }
+    return null;
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  async function boot() {
+    try {
+      var results = await Promise.all([
+        fetch("backend/f1_2025_drivers_Dataset.json").then(function(r){return r.json();}),
+        fetch("backend/f1_teams_dataset.json").then(function(r){return r.json();})
+      ]);
+      var driversData = results[0], teamsData = results[1];
+
+      seedContracts();
+
+      var drivers = Array.isArray(driversData) ? driversData : (driversData.drivers||[]);
+      var driver  = drivers.find(function(d){ return d.driverId === driverId; });
+      if (!driver) {
+        showToast("Driver not found. Logging out.", "error");
+        setTimeout(function(){ location.replace("index.html"); }, 2000);
+        return;
+      }
+
+      var allTeams = Array.isArray(teamsData) ? teamsData : (teamsData.teams||[]);
+      var team     = resolveTeam(driver, allTeams);
+
+      if (team) { applyTheme(team); applyFont(team.teamId); } else { applyFont(""); }
+
+      fillSidebar(driver, team);
+      fillOverview(driver, team);
+      fillFinancials(driver, team);
+      fillContract(driver, team, drivers);
+      wireNav();
+      wireLogout();
+
+      document.getElementById("loadingScreen").style.display = "none";
+      document.getElementById("layout").style.visibility = "visible";
+
+      // Hash deep-link: #overview, #financials, #contract
+      var hash = location.hash.replace("#","");
+      var hashMap = {overview:"section-overview", financials:"section-financials", contract:"section-contract"};
+      if (hash && hashMap[hash]) {
+        document.querySelectorAll(".nav-link").forEach(function(l){l.classList.remove("active");l.style.borderLeftColor="";});
+        document.querySelectorAll(".section").forEach(function(s){s.classList.remove("active");});
+        document.getElementById(hashMap[hash]).classList.add("active");
+        var matchNav = document.querySelector('[data-target="'+hashMap[hash]+'"]');
+        if (matchNav) { matchNav.classList.add("active"); matchNav.style.borderLeftColor = accentColor; }
+        history.replaceState(null,"",location.pathname);
+      }
+
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to load data: " + err.message, "error");
+      document.getElementById("loadingScreen").querySelector(".loading-text").textContent = "Error loading data.";
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

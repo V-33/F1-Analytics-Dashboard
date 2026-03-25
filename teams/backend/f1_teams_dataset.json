@@ -1,0 +1,263 @@
+{
+  "teams": [
+    {
+      "teamId": "RB01",
+      "teamName": "Red Bull Racing",
+      "shortName": "Red Bull",
+      "logo": "images/team_logo/rblogo.svg",
+      "theme": {
+        "primary": "#0600EF",
+        "secondary": "#FCD700",
+        "accent": "#DC1F26"
+      },
+      "performance": {
+        "constructorChampionships": 6,
+        "lastSeasonPosition": 1,
+        "developmentIndex": 9.5,
+        "reliabilityScore": 8.8,
+        "aeroEfficiency": 9.4
+      },
+      "financial": {
+        "annualBudget": 540000000,
+        "salaryCapAllocation": 65000000,
+        "sponsorRevenue": 310000000,
+        "bonusPool": 25000000,
+        "signingBonusAvailable": 15000000
+      }
+    },
+
+    {
+      "teamId": "MER01",
+      "teamName": "Mercedes AMG Petronas",
+      "shortName": "Mercedes",
+      "logo": "images/team_logo/Mercedes_black.png",
+      "theme": {
+        "primary": "#000000",
+        "secondary": "#C0C0C0",
+        "accent": "#00D2BE"
+      },
+      "performance": {
+        "constructorChampionships": 8,
+        "lastSeasonPosition": 2,
+        "developmentIndex": 9.1,
+        "reliabilityScore": 9.2,
+        "aeroEfficiency": 8.9
+      },
+      "financial": {
+        "annualBudget": 502000000,
+        "salaryCapAllocation": 60000000,
+        "sponsorRevenue": 285000000,
+        "bonusPool": 23000000,
+        "signingBonusAvailable": 20000000
+      }
+    },
+
+    {
+      "teamId": "FER01",
+      "teamName": "Scuderia Ferrari",
+      "shortName": "Ferrari",
+      "logo": "images/team_logo/ferrari.svg",
+      "theme": {
+        "primary": "#DC0000",
+        "secondary": "#FFF200",
+        "accent": "#DC0000"
+      },
+      "performance": {
+        "constructorChampionships": 16,
+        "lastSeasonPosition": 3,
+        "developmentIndex": 8.6,
+        "reliabilityScore": 7.9,
+        "aeroEfficiency": 8.7
+      },
+      "financial": {
+        "annualBudget": 480000000,
+        "salaryCapAllocation": 65000000,
+        "sponsorRevenue": 320000000,
+        "bonusPool": 30000000,
+        "signingBonusAvailable": 25000000
+      }
+    },
+
+    {
+      "teamId": "MCL01",
+      "teamName": "McLaren F1 Team",
+      "shortName": "McLaren",
+      "logo": "images/team_logo/mclaren.svg",
+      "theme": {
+        "primary": "#FF8700",
+        "secondary": "#47C7FC",
+        "accent": "#FF8700"
+      },
+      "performance": {
+        "constructorChampionships": 8,
+        "lastSeasonPosition": 4,
+        "developmentIndex": 8.2,
+        "reliabilityScore": 8.4,
+        "aeroEfficiency": 8.3
+      },
+      "financial": {
+        "annualBudget": 410000000,
+        "salaryCapAllocation": 45000000,
+        "sponsorRevenue": 220000000,
+        "bonusPool": 18000000,
+        "signingBonusAvailable": 10000000
+      }
+    },
+
+    {
+      "teamId": "AST01",
+      "teamName": "Aston Martin F1 Team",
+      "shortName": "Aston Martin",
+      "logo": "images/team_logo/astonmartin.svg",
+      "theme": {
+        "primary": "#006F62",
+        "secondary": "#CEDC00",
+        "accent": "#CEDC00"
+      },
+      "performance": {
+        "constructorChampionships": 0,
+        "lastSeasonPosition": 5,
+        "developmentIndex": 7.9,
+        "reliabilityScore": 7.8,
+        "aeroEfficiency": 8.0
+      },
+      "financial": {
+        "annualBudget": 390000000,
+        "salaryCapAllocation": 40000000,
+        "sponsorRevenue": 200000000,
+        "bonusPool": 15000000,
+        "signingBonusAvailable": 8000000
+      }
+    },
+
+    {
+      "teamId": "ALP01",
+      "teamName": "Alpine F1 Team",
+      "shortName": "Alpine",
+      "logo": "images/team_logo/alpine.svg",
+      "theme": {
+        "primary": "#0090FF",
+        "secondary": "#FF87BC",
+        "accent": "#0090FF"
+      },
+      "performance": {
+        "constructorChampionships": 2,
+        "lastSeasonPosition": 6,
+        "developmentIndex": 7.5,
+        "reliabilityScore": 7.4,
+        "aeroEfficiency": 7.8
+      },
+      "financial": {
+        "annualBudget": 360000000,
+        "salaryCapAllocation": 35000000,
+        "sponsorRevenue": 180000000,
+        "bonusPool": 12000000,
+        "signingBonusAvailable": 7000000
+      }
+    },
+
+    {
+      "teamId": "WIL01",
+      "teamName": "Williams Racing",
+      "shortName": "Williams",
+      "logo": "images/team_logo/williams.svg",
+      "theme": {
+        "primary": "#005AFF",
+        "secondary": "#00AEEF",
+        "accent": "#005AFF"
+      },
+      "performance": {
+        "constructorChampionships": 9,
+        "lastSeasonPosition": 7,
+        "developmentIndex": 6.9,
+        "reliabilityScore": 7.2,
+        "aeroEfficiency": 7.0
+      },
+      "financial": {
+        "annualBudget": 310000000,
+        "salaryCapAllocation": 25000000,
+        "sponsorRevenue": 140000000,
+        "bonusPool": 8000000,
+        "signingBonusAvailable": 4000000
+      }
+    },
+
+    {
+      "teamId": "VCARB01",
+      "teamName": "Visa Cash App RB",
+      "shortName": "VCARB",
+      "logo": "images/team_logo/vcarb.svg",
+      "theme": {
+        "primary": "#1E2A44",
+        "secondary": "#FFFFFF",
+        "accent": "#E10600"
+      },
+      "performance": {
+        "constructorChampionships": 0,
+        "lastSeasonPosition": 8,
+        "developmentIndex": 6.5,
+        "reliabilityScore": 7.0,
+        "aeroEfficiency": 6.8
+      },
+      "financial": {
+        "annualBudget": 290000000,
+        "salaryCapAllocation": 20000000,
+        "sponsorRevenue": 130000000,
+        "bonusPool": 7000000,
+        "signingBonusAvailable": 3500000
+      }
+    },
+
+    {
+      "teamId": "SAU01",
+      "teamName": "Stake F1 Team (Sauber)",
+      "shortName": "Sauber",
+      "logo": "images/team_logo/sauber.svg",
+      "theme": {
+        "primary": "#00E600",
+        "secondary": "#000000",
+        "accent": "#00E600"
+      },
+      "performance": {
+        "constructorChampionships": 0,
+        "lastSeasonPosition": 9,
+        "developmentIndex": 6.2,
+        "reliabilityScore": 6.8,
+        "aeroEfficiency": 6.5
+      },
+      "financial": {
+        "annualBudget": 270000000,
+        "salaryCapAllocation": 18000000,
+        "sponsorRevenue": 110000000,
+        "bonusPool": 6000000,
+        "signingBonusAvailable": 3000000
+      }
+    },
+
+    {
+      "teamId": "HAA01",
+      "teamName": "Haas F1 Team",
+      "shortName": "Haas",
+      "logo": "images/team_logo/haas.svg",
+      "theme": {
+        "primary": "#FFFFFF",
+        "secondary": "#000000",
+        "accent": "#E10600"
+      },
+      "performance": {
+        "constructorChampionships": 0,
+        "lastSeasonPosition": 10,
+        "developmentIndex": 6.0,
+        "reliabilityScore": 6.5,
+        "aeroEfficiency": 6.3
+      },
+      "financial": {
+        "annualBudget": 250000000,
+        "salaryCapAllocation": 15000000,
+        "sponsorRevenue": 95000000,
+        "bonusPool": 5000000,
+        "signingBonusAvailable": 2500000
+      }
+    }
+  ]
+}

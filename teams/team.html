@@ -1,0 +1,2151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Team Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="contracts.js"></script>
+  <style>
+    @font-face {
+      font-family: "Unity Sans";
+      src: url("fonts/UnitySans-Regular.woff2") format("woff2"),
+        url("fonts/UnitySans-Regular.woff") format("woff");
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "Unity Sans";
+      src: url("fonts/UnitySans-Bold.woff2") format("woff2"),
+        url("fonts/UnitySans-Bold.woff") format("woff");
+      font-weight: 700;
+    }
+
+    @font-face {
+      font-family: "RB Futura";
+      src: url("fonts/FuturaCyrillicBook.woff2") format("woff2"),
+        url("fonts/FuturaCyrillicBook.woff") format("woff");
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: "RB Futura";
+      src: url("fonts/FuturaCyrillicBold.woff2") format("woff2"),
+        url("fonts/FuturaCyrillicBold.woff") format("woff");
+      font-weight: 700;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Cursor ── */
+    .cursor {
+      width: 12px;
+      height: 12px;
+      background: #e10600;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 100000;
+      transform: translate(-50%, -50%);
+      transition: background 0.2s;
+    }
+
+    .cursor-trail {
+      width: 28px;
+      height: 28px;
+      border: 2px solid rgba(225, 6, 0, 0.5);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: border-color 0.2s;
+    }
+
+    @media (max-width: 600px) {
+
+      .cursor,
+      .cursor-trail {
+        display: none;
+      }
+    }
+
+    /* ── Top bar ── */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #e10600;
+      z-index: 200;
+      transition: background 0.4s;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      min-height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      background: #0a0a0a;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+      transition: background 0.4s;
+    }
+
+    .sidebar-top {
+      padding: 28px 20px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .sidebar-teamname {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-role {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .sidebar-bar {
+      height: 3px;
+      width: 36px;
+      border-radius: 2px;
+      background: #e10600;
+      margin-top: 10px;
+      transition: background 0.4s;
+    }
+
+    .nav {
+      flex: 1;
+      padding: 18px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 20px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-link.active {
+      color: #fff;
+      border-left-color: #e10600;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .sidebar-bottom {
+      padding: 16px 20px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .btn-back {
+      display: block;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    /* ── Main ── */
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      padding: 36px 40px 60px;
+    }
+
+    /* ── Section ── */
+    .section {
+      display: none;
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .section-accent {
+      width: 6px;
+      height: 34px;
+      border-radius: 3px;
+      background: #e10600;
+      flex-shrink: 0;
+      transition: background 0.4s;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* ── Sub-header ── */
+    .sub-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+
+    .sub-accent {
+      width: 4px;
+      height: 22px;
+      border-radius: 2px;
+      background: #e10600;
+      flex-shrink: 0;
+      transition: background 0.4s;
+    }
+
+    .sub-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .sub-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    /* ── Grids ── */
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    @media (max-width: 1280px) {
+      .grid-5 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+
+      .grid-3,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+
+      .grid-5,
+      .grid-4 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* ── Team Hero ── */
+    .team-hero {
+      background: #0a0a0a;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .team-hero::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(225, 6, 0, 0.07), transparent 70%);
+      pointer-events: none;
+      transition: background 0.4s;
+    }
+
+    .team-hero-info {
+      flex: 1;
+    }
+
+    .team-hero-name {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.05;
+      margin-bottom: 6px;
+      transition: color 0.4s;
+    }
+
+    .team-hero-short {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .team-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #22c55e;
+    }
+
+    .team-hero-champs {
+      font-size: 7rem;
+      font-weight: 700;
+      line-height: 1;
+      opacity: 0.06;
+      position: absolute;
+      right: 36px;
+      top: 50%;
+      transform: translateY(-50%);
+      letter-spacing: -6px;
+      transition: color 0.4s;
+      pointer-events: none;
+    }
+
+    /* ── Stat Cards ── */
+    .card {
+      background: #0a0a0a;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 22px;
+      position: relative;
+      overflow: visible;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(225, 6, 0, 0.1), transparent 66%);
+      opacity: 0;
+      transition: opacity 0.22s;
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: rgba(255, 255, 255, 0.45);
+      margin-bottom: 8px;
+    }
+
+    .value {
+      font-size: 1.55rem;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+
+    .value-sm {
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .note {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 5px;
+    }
+
+    .gold {
+      color: #b8aa76;
+    }
+
+    .green {
+      color: #22c55e;
+    }
+
+    /* ── Driver Cards (Current Drivers section) ── */
+    .driver-card {
+      background: #0a0a0a;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.24s ease, box-shadow 0.24s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .driver-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .driver-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(225, 6, 0, 0.1), transparent 66%);
+      opacity: 0;
+      transition: opacity 0.24s;
+      pointer-events: none;
+    }
+
+    .driver-card:hover::before {
+      opacity: 1;
+    }
+
+    .dc-number {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      font-size: 3.5rem;
+      font-weight: 700;
+      opacity: 0.07;
+      line-height: 1;
+      letter-spacing: -2px;
+      transition: color 0.4s;
+    }
+
+    .dc-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .dc-nationality {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 18px;
+    }
+
+    .dc-salary {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #b8aa76;
+      margin-bottom: 4px;
+    }
+
+    .dc-salary-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+      color: rgba(255, 255, 255, 0.35);
+      margin-bottom: 16px;
+    }
+
+    .dc-stats {
+      display: flex;
+      gap: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 16px;
+      margin-top: auto;
+    }
+
+    .dc-stat {
+      flex: 1;
+      text-align: center;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .dc-stat:last-child {
+      border-right: none;
+    }
+
+    .dc-stat-val {
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+
+    .dc-stat-label {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .dc-footer {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dc-contract-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .dc-contract-val {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .no-drivers-msg {
+      text-align: center;
+      padding: 56px 20px;
+      color: rgba(255, 255, 255, 0.28);
+      font-size: 0.92rem;
+      background: #0a0a0a;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* ── Offer section layout ── */
+    .drivers-panel {
+      background: #0a0a0a;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+      height: fit-content;
+    }
+
+    .drivers-panel-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: rgba(255, 255, 255, 0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .driver-count {
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      padding: 2px 10px;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .drivers-list {
+      max-height: 420px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    }
+
+    .drivers-list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .drivers-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .drivers-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+
+    .driver-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+
+    .driver-row:last-child {
+      border-bottom: none;
+    }
+
+    .driver-row:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .driver-row.selected {
+      background: rgba(225, 6, 0, 0.08);
+      border-left: 3px solid #e10600;
+      padding-left: 19px;
+    }
+
+    .driver-num {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.18);
+      width: 32px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .driver-row.selected .driver-num {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .driver-info {
+      flex: 1;
+    }
+
+    .driver-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .driver-team {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 1px;
+    }
+
+    .driver-stats {
+      display: flex;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .driver-stat {
+      text-align: right;
+    }
+
+    .driver-stat .ds-label {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .driver-stat .ds-val {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .driver-salary {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #b8aa76;
+      flex-shrink: 0;
+    }
+
+    /* ── Offer Form ── */
+    .form-panel {
+      background: #0a0a0a;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 28px;
+      height: fit-content;
+    }
+
+    .form-section-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-title-accent {
+      width: 4px;
+      height: 18px;
+      border-radius: 2px;
+      background: #e10600;
+      flex-shrink: 0;
+      transition: background 0.4s;
+    }
+
+    .form-selected-driver {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 22px;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.38);
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-selected-driver.has-driver {
+      color: #fff;
+      border-color: rgba(225, 6, 0, 0.28);
+      background: rgba(225, 6, 0, 0.05);
+    }
+
+    .selected-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(225, 6, 0, 0.15);
+      border: 1px solid rgba(225, 6, 0, 0.3);
+      color: #e10600;
+      flex-shrink: 0;
+    }
+
+    .form-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 20px 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 500px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: rgba(255, 255, 255, 0.42);
+    }
+
+    .field input,
+    .field select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: #fff;
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(225, 6, 0, 0.5);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .field input::placeholder {
+      color: rgba(255, 255, 255, 0.18);
+    }
+
+    .field select option {
+      background: #111;
+      color: #fff;
+    }
+
+    .cap-hint {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.3);
+      margin-top: 2px;
+    }
+
+    .cap-hint.over {
+      color: #e10600;
+    }
+
+    .btn-send {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(225, 6, 0, 0.14);
+      border: 1px solid rgba(225, 6, 0, 0.38);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, transform 0.18s, box-shadow 0.18s;
+      margin-top: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-send:hover:not(:disabled) {
+      background: rgba(225, 6, 0, 0.26);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(225, 6, 0, 0.2);
+    }
+
+    .btn-send:active {
+      transform: translateY(0);
+    }
+
+    .btn-send:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: #0a0a0a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px 22px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      z-index: 9999;
+      transform: translateY(16px);
+      opacity: 0;
+      transition: transform 0.28s, opacity 0.28s;
+      max-width: 340px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #22c55e;
+    }
+
+    .toast.error {
+      border-color: rgba(225, 6, 0, 0.4);
+      color: #e10600;
+    }
+
+    .toast.info {
+      border-color: rgba(96, 165, 250, 0.4);
+      color: #60a5fa;
+    }
+
+    /* ── Loading ── */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .loading-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .loading-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #e10600;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .loading-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.8);
+        opacity: 0.5
+      }
+
+      40% {
+        transform: scale(1.2);
+        opacity: 1
+      }
+    }
+
+    .loading-text {
+      font-size: 0.84rem;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    /* ── Error screen ── */
+    .error-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 14px;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .error-screen.show {
+      display: flex;
+    }
+
+    .error-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #e10600;
+    }
+
+    .error-msg {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.5);
+      max-width: 360px;
+    }
+
+    .error-link {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.82rem;
+      text-decoration: underline;
+    }
+
+    /* ── Spacing ── */
+    .mt-8 {
+      margin-top: 8px;
+    }
+
+    .mt-16 {
+      margin-top: 16px;
+    }
+
+    .mb-0 {
+      margin-bottom: 0;
+    }
+
+    /* ── Theme toggle button ── */
+    .btn-theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s;
+      margin-bottom: 10px;
+    }
+    .btn-theme-toggle:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* ── Info tooltip ── */
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.13);
+      color: rgba(255,255,255,0.55);
+      font-size: 0.6rem;
+      font-weight: 700;
+      font-style: normal;
+      cursor: help;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+      vertical-align: middle;
+      line-height: 1;
+      transition: background 0.2s;
+    }
+    .info-icon:hover { background: rgba(255,255,255,0.28); }
+    .info-icon::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 7px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1c1c1c;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      padding: 6px 11px;
+      font-size: 0.68rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.9);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.18s;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+      font-family: "Poppins", sans-serif;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .info-icon:hover::after { opacity: 1; }
+
+    /* ── Sent offers panel ── */
+    .sent-offers-panel {
+      background: #0a0a0a;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden;
+      margin-top: 28px;
+    }
+    .sent-offers-header {
+      padding: 14px 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.45px;
+      color: rgba(255,255,255,0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sent-offer-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.83rem;
+    }
+    .sent-offer-row:last-child { border-bottom: none; }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-pending     { background: #e10600; }
+    .dot-active      { background: #22c55e; }
+    .dot-accepted    { background: #22c55e; }
+    .dot-negotiating { background: #60a5fa; }
+    .dot-rejected    { background: rgba(255,255,255,0.25); }
+    .dot-terminated  { background: rgba(255,255,255,0.25); }
+    .dot-expired     { background: rgba(255,255,255,0.18); }
+    .so-driver { font-weight: 600; flex: 1; }
+    .so-salary { color: #b8aa76; font-size: 0.8rem; flex-shrink: 0; }
+    .so-length { color: rgba(255,255,255,0.4); font-size: 0.75rem; flex-shrink: 0; }
+    .so-status {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+      padding: 2px 9px;
+      border-radius: 8px;
+    }
+    .so-status.pending     { color: #e10600; background: rgba(225,6,0,0.1); border: 1px solid rgba(225,6,0,0.25); }
+    .so-status.active,
+    .so-status.accepted    { color: #22c55e; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); }
+    .so-status.negotiating { color: #60a5fa; background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.25); }
+    .so-status.rejected,
+    .so-status.terminated  { color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+    .so-status.expired     { color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+    .no-offers-msg { padding: 28px; text-align: center; color: rgba(255,255,255,0.28); font-size: 0.83rem; }
+
+    /* ── Incoming drivers badge ── */
+    .incoming-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      background: rgba(34,197,94,0.13);
+      border: 1px solid rgba(34,197,94,0.32);
+      color: #22c55e;
+      margin-top: 8px;
+    }
+    .incoming-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+    .label-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .label-row .label { margin-bottom: 0; }
+
+    /* ═══════════════════════════
+       LIGHT MODE
+    ═══════════════════════════ */
+    body.light-mode { background: #f4f4f7; color: #111; }
+    body.light-mode .sidebar { background: #f0f0f0 !important; border-right-color: rgba(0,0,0,0.1); }
+    body.light-mode .sidebar-teamname { color: #111; }
+    body.light-mode .sidebar-role { color: rgba(0,0,0,0.5); }
+    body.light-mode .nav-link { color: rgba(0,0,0,0.6); }
+    body.light-mode .nav-link:hover { color: #111; background: rgba(0,0,0,0.06); }
+    body.light-mode .nav-link.active { color: #111; background: rgba(0,0,0,0.08); }
+    body.light-mode .btn-back { background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.6); }
+    body.light-mode .btn-back:hover { color: #111; background: rgba(0,0,0,0.12); }
+    body.light-mode .btn-theme-toggle { background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.65); }
+    body.light-mode .btn-theme-toggle:hover { background: rgba(0,0,0,0.12); color: #111; }
+    body.light-mode .card { background: #fff !important; border-color: rgba(0,0,0,0.1) !important; color: #111 !important; }
+    body.light-mode .driver-card { background: #fff !important; border-color: rgba(0,0,0,0.1) !important; color: #111 !important; }
+    body.light-mode .team-hero { background: #fff !important; border-color: rgba(0,0,0,0.1) !important; }
+    body.light-mode .team-hero-name { color: #111; }
+    body.light-mode .team-hero-short { color: rgba(0,0,0,0.45); }
+    body.light-mode .team-hero-champs { color: #000; }
+    body.light-mode .drivers-panel { background: #fff !important; border-color: rgba(0,0,0,0.1) !important; }
+    body.light-mode .drivers-panel-header { color: rgba(0,0,0,0.5); border-bottom-color: rgba(0,0,0,0.08); }
+    body.light-mode .driver-count { background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.5); }
+    body.light-mode .driver-row { border-bottom-color: rgba(0,0,0,0.05); }
+    body.light-mode .driver-row:hover { background: rgba(0,0,0,0.04); }
+    body.light-mode .driver-name { color: #111; }
+    body.light-mode .driver-team { color: rgba(0,0,0,0.45); }
+    body.light-mode .driver-num { color: rgba(0,0,0,0.2); }
+    body.light-mode .form-panel { background: #fff !important; border-color: rgba(0,0,0,0.1) !important; }
+    body.light-mode .form-section-title { color: rgba(0,0,0,0.5); }
+    body.light-mode .form-selected-driver { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.45); }
+    body.light-mode .form-divider { background: rgba(0,0,0,0.08); }
+    body.light-mode .field label { color: rgba(0,0,0,0.5); }
+    body.light-mode .field input, body.light-mode .field select { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.12); color: #111; }
+    body.light-mode .field select option { background: #fff; color: #111; }
+    body.light-mode .field input::placeholder { color: rgba(0,0,0,0.25); }
+    body.light-mode .no-drivers-msg { background: #fff; border-color: rgba(0,0,0,0.08); color: rgba(0,0,0,0.35); }
+    body.light-mode .label { color: rgba(0,0,0,0.5); }
+    body.light-mode .value { color: #111; }
+    body.light-mode .value-sm { color: #111; }
+    body.light-mode .note { color: rgba(0,0,0,0.42); }
+    body.light-mode .gold { color: #7a6a2a; }
+    body.light-mode .section-line { background: rgba(0,0,0,0.12); }
+    body.light-mode .sub-line { background: rgba(0,0,0,0.07); }
+    body.light-mode .sub-title { color: rgba(0,0,0,0.45); }
+    body.light-mode .dc-name { color: #111; }
+    body.light-mode .dc-nationality { color: rgba(0,0,0,0.45); }
+    body.light-mode .dc-salary { color: #7a6a2a; }
+    body.light-mode .dc-salary-label { color: rgba(0,0,0,0.35); }
+    body.light-mode .dc-stats { border-top-color: rgba(0,0,0,0.07); }
+    body.light-mode .dc-stat { border-right-color: rgba(0,0,0,0.06); }
+    body.light-mode .dc-stat-val { color: #111; }
+    body.light-mode .dc-stat-label { color: rgba(0,0,0,0.38); }
+    body.light-mode .dc-footer { border-top-color: rgba(0,0,0,0.06); }
+    body.light-mode .dc-contract-label { color: rgba(0,0,0,0.38); }
+    body.light-mode .dc-contract-val { color: rgba(0,0,0,0.65); }
+    body.light-mode .toast { background: #fff; border-color: rgba(0,0,0,0.12); color: #111; }
+    body.light-mode .loading-screen { background: #f4f4f7; }
+    body.light-mode .error-screen { background: #f4f4f7; }
+    body.light-mode .info-icon { background: rgba(0,0,0,0.1); color: rgba(0,0,0,0.5); }
+    body.light-mode .info-icon::after { background: #fff; border-color: rgba(0,0,0,0.15); color: #111; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    body.light-mode .sent-offers-panel { background: #fff !important; border-color: rgba(0,0,0,0.1) !important; }
+    body.light-mode .sent-offers-header { color: rgba(0,0,0,0.5); border-bottom-color: rgba(0,0,0,0.08); }
+    body.light-mode .sent-offer-row { border-bottom-color: rgba(0,0,0,0.05); }
+    body.light-mode .so-driver { color: #111; }
+    body.light-mode .so-length { color: rgba(0,0,0,0.42); }
+    body.light-mode .no-offers-msg { color: rgba(0,0,0,0.32); }
+    body.light-mode .driver-salary { color: #7a6a2a; }
+  </style>
+</head>
+
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-dots">
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+    </div>
+    <div class="loading-text" id="loadingText">Loading team data…</div>
+  </div>
+
+  <div class="error-screen" id="errorScreen">
+    <div class="error-title">Team Not Found</div>
+    <div class="error-msg" id="errorMsg">No teamId specified in the URL. Use team.html?teamId=RB01</div>
+    <a href="index.html" class="error-link">← Return to login</a>
+  </div>
+
+  <div class="top-bar" id="topBar"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-trail" id="cursorTrail"></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="layout" id="layout" style="visibility:hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-teamname" id="sidebarName">—</div>
+        <div class="sidebar-role">Team Manager</div>
+        <div class="sidebar-bar" id="sidebarBar"></div>
+      </div>
+      <nav class="nav">
+        <div class="nav-link active" data-target="section-overview">
+          <span>◈</span> Team Overview
+        </div>
+        <div class="nav-link" data-target="section-drivers">
+          <span>◉</span> Current Drivers
+        </div>
+        <div class="nav-link" data-target="section-offer">
+          <span>◎</span> Send Offer
+        </div>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="btn-theme-toggle" id="themeToggle">
+          <span id="themeIcon">☀</span><span id="themeLabel"> Light Mode</span>
+        </button>
+        <button class="btn-back" id="logoutBtn">← Back to Login</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- ── SECTION 1: TEAM OVERVIEW ── -->
+      <section class="section active" id="section-overview">
+        <div class="section-header">
+          <div class="section-accent" id="accentOv"></div>
+          <span class="section-title">Team Overview</span>
+          <span class="section-line"></span>
+        </div>
+
+        <!-- Team Hero -->
+        <div class="team-hero" id="teamHero">
+          <div class="team-hero-info">
+            <div class="team-hero-name" id="heroTeamName">—</div>
+            <div class="team-hero-short" id="heroShortName">—</div>
+            <div class="team-hero-badge">Active · 2025 Season</div>
+          </div>
+          <div class="team-hero-champs" id="heroChamps">0</div>
+        </div>
+
+        <!-- Financial stats -->
+        <div class="sub-header">
+          <div class="sub-accent" id="subAccentFin"></div>
+          <span class="sub-title">Financials</span>
+          <span class="sub-line"></span>
+        </div>
+        <div class="grid-5">
+          <div class="card">
+            <div class="label">Annual Budget <span class="info-icon" data-tip="Total team operating spend for the season">i</span></div>
+            <div class="value gold" id="ovBudget">—</div>
+            <div class="note">Total spend</div>
+          </div>
+          <div class="card">
+            <div class="label">Salary Cap <span class="info-icon" data-tip="Maximum driver salary allocation allowed">i</span></div>
+            <div class="value gold" id="ovCap">—</div>
+            <div class="note">Allocation</div>
+          </div>
+          <div class="card">
+            <div class="label">Sponsor Revenue <span class="info-icon" data-tip="Total annual income from team sponsors">i</span></div>
+            <div class="value" id="ovSponsor">—</div>
+            <div class="note">Annual</div>
+          </div>
+          <div class="card">
+            <div class="label">Bonus Pool <span class="info-icon" data-tip="Performance-based pool split between drivers">i</span></div>
+            <div class="value" id="ovBonus">—</div>
+            <div class="note">Performance pool</div>
+          </div>
+          <div class="card">
+            <div class="label">Signing Bonus Avail. <span class="info-icon" data-tip="Remaining budget available for signing bonuses">i</span></div>
+            <div class="value" id="ovSigning">—</div>
+            <div class="note">Available</div>
+          </div>
+        </div>
+
+        <!-- Performance stats -->
+        <div class="sub-header mt-8">
+          <div class="sub-accent" id="subAccentPerf"></div>
+          <span class="sub-title">Performance</span>
+          <span class="sub-line"></span>
+        </div>
+        <div class="grid-5">
+          <div class="card">
+            <div class="label">Championships <span class="info-icon" data-tip="Total constructor championship titles won">i</span></div>
+            <div class="value" id="ovChamps">—</div>
+            <div class="note">Constructor titles</div>
+          </div>
+          <div class="card">
+            <div class="label">Last Season <span class="info-icon" data-tip="Final position in last season's constructors' championship">i</span></div>
+            <div class="value" id="ovLastPos">—</div>
+            <div class="note">Constructors' position</div>
+          </div>
+          <div class="card">
+            <div class="label">Dev Index <span class="info-icon" data-tip="Car development capability rating out of 10">i</span></div>
+            <div class="value" id="ovDev">—</div>
+            <div class="note">/ 10</div>
+          </div>
+          <div class="card">
+            <div class="label">Reliability Score <span class="info-icon" data-tip="Mechanical reliability and DNF rate rating out of 10">i</span></div>
+            <div class="value" id="ovRel">—</div>
+            <div class="note">/ 10</div>
+          </div>
+          <div class="card">
+            <div class="label">Aero Efficiency <span class="info-icon" data-tip="Aerodynamic downforce-to-drag performance score out of 10">i</span></div>
+            <div class="value" id="ovAero">—</div>
+            <div class="note">/ 10</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 2: CURRENT DRIVERS ── -->
+      <section class="section" id="section-drivers">
+        <div class="section-header">
+          <div class="section-accent" id="accentDrv"></div>
+          <span class="section-title">Current Drivers</span>
+          <span class="section-line"></span>
+        </div>
+        <div class="grid-3" id="currentDriversGrid">
+          <!-- filled dynamically -->
+        </div>
+
+        <!-- Incoming Drivers subsection (shown only when active contracts exist) -->
+        <div id="incomingDriversSection" style="display:none">
+          <div class="sub-header mt-16">
+            <div class="sub-accent" id="subAccentIncoming"></div>
+            <span class="sub-title">Incoming Drivers</span>
+            <span class="sub-line"></span>
+          </div>
+          <div class="grid-3" id="incomingDriversGrid">
+            <!-- filled dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION 3: SEND OFFER ── -->
+      <section class="section" id="section-offer">
+        <div class="section-header">
+          <div class="section-accent" id="accentOffer"></div>
+          <span class="section-title">Send Offer</span>
+          <span class="section-line"></span>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Driver list panel -->
+          <div>
+            <div class="drivers-panel">
+              <div class="drivers-panel-header">
+                Available Drivers
+                <span class="driver-count" id="driverCount">0 drivers</span>
+              </div>
+              <div class="drivers-list" id="driversList"></div>
+            </div>
+          </div>
+
+          <!-- Offer form -->
+          <div class="form-panel">
+            <div class="form-section-title">
+              <span class="form-title-accent" id="formAccent"></span>
+              Compose Offer
+            </div>
+
+            <!-- Selected driver display -->
+            <div class="form-selected-driver" id="selectedDriverDisplay">
+              Select a driver from the list ←
+            </div>
+
+            <div class="form-divider"></div>
+
+            <!-- Driver dropdown (synced with list) -->
+            <div class="field" style="margin-bottom:18px">
+              <label>Driver</label>
+              <select id="driverSelect">
+                <option value="">— Select a driver —</option>
+              </select>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label>Base Salary (USD)</label>
+                <input type="number" id="inputSalary" placeholder="e.g. 20,000,000" min="0" step="500000">
+                <div class="cap-hint" id="capHint"></div>
+              </div>
+              <div class="field">
+                <label>Championship Bonus (USD)</label>
+                <input type="number" id="inputBonus" placeholder="e.g. 5,000,000" min="0" step="250000">
+              </div>
+              <div class="field">
+                <label>Signing Bonus (USD)</label>
+                <input type="number" id="inputSigning" placeholder="e.g. 10,000,000" min="0" step="500000">
+              </div>
+              <div class="field">
+                <label>Contract Length (years)</label>
+                <input type="number" id="inputLength" placeholder="1 – 5" min="1" max="5" step="1" value="2">
+              </div>
+            </div>
+
+            <button class="btn-send" id="sendBtn" disabled>Select a Driver First</button>
+          </div>
+
+        </div>
+
+        <!-- Sent Offers Tracker -->
+        <div class="sent-offers-panel" id="sentOffersPanel">
+          <div class="sent-offers-header">
+            Sent Offers
+            <span class="driver-count" id="offersCount">0 offers</span>
+          </div>
+          <div id="sentOffersList">
+            <div class="no-offers-msg">No offers sent yet.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // ── URL param ────────────────────────────────────────────────────────────
+      var teamId = new URLSearchParams(location.search).get("teamId");
+
+      if (!teamId) {
+        document.getElementById("loadingScreen").style.display = "none";
+        document.getElementById("errorScreen").classList.add("show");
+        return;
+      }
+
+      // ── Cursor ───────────────────────────────────────────────────────────────
+      var cur = document.getElementById("cursor");
+      var trail = document.getElementById("cursorTrail");
+      var mx = 0, my = 0, tx = 0, ty = 0;
+      document.addEventListener("mousemove", function (e) { mx = e.clientX; my = e.clientY; });
+      (function loop() {
+        cur.style.left = mx + "px"; cur.style.top = my + "px";
+        tx += (mx - tx) * 0.12; ty += (my - ty) * 0.12;
+        trail.style.left = tx + "px"; trail.style.top = ty + "px";
+        requestAnimationFrame(loop);
+      })();
+
+      // ── Toast ────────────────────────────────────────────────────────────────
+      var toastEl = document.getElementById("toast");
+      var toastTimer;
+      function showToast(msg, type) {
+        clearTimeout(toastTimer);
+        toastEl.textContent = msg;
+        toastEl.className = "toast show " + (type || "info");
+        toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 3400);
+      }
+
+      // ── Format ───────────────────────────────────────────────────────────────
+      function fmt(n) {
+        if (!n && n !== 0) return "N/A";
+        if (Math.abs(n) >= 1e9) return "$" + (n / 1e9).toFixed(2) + "B";
+        if (Math.abs(n) >= 1e6) return "$" + (n / 1e6).toFixed(0) + "M";
+        if (Math.abs(n) >= 1e3) return "$" + (n / 1e3).toFixed(0) + "K";
+        return "$" + n;
+      }
+      function ordinal(n) {
+        if (!n) return "—";
+        var s = ["th", "st", "nd", "rd"];
+        var v = n % 100;
+        return n + (s[(v - 20) % 10] || s[v] || s[0]);
+      }
+      function calcEndorsements(end) {
+        if (!end) return 0;
+        if (typeof end === "number") return end;
+        if (Array.isArray(end)) {
+          return end.reduce(function (s, e) {
+            var v = parseFloat(String(e.annualValue || e.value || e.amount || e || "0").replace(/[^0-9.]/g, ""));
+            return s + (isNaN(v) ? 0 : v);
+          }, 0);
+        }
+        return parseFloat(String(end).replace(/[^0-9.]/g, "")) || 0;
+      }
+
+      // ── Theme ────────────────────────────────────────────────────────────────
+      var accentColor = "#e10600";
+
+      function getLuminance(hex) {
+        var h = hex.replace("#", "");
+        if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+        var r = parseInt(h.slice(0,2),16)/255, g = parseInt(h.slice(2,4),16)/255, b = parseInt(h.slice(4,6),16)/255;
+        r = r < 0.04045 ? r/12.92 : Math.pow((r+0.055)/1.055,2.4);
+        g = g < 0.04045 ? g/12.92 : Math.pow((g+0.055)/1.055,2.4);
+        b = b < 0.04045 ? b/12.92 : Math.pow((b+0.055)/1.055,2.4);
+        return 0.2126*r + 0.7152*g + 0.0722*b;
+      }
+
+      function applyTheme(team) {
+        if (!team || !team.theme) return;
+        accentColor = team.theme.accent || team.theme.secondary || "#e10600";
+        var secondary = team.theme.secondary || accentColor;
+        var primary = team.theme.primary || "#0a0a0a";
+
+        document.getElementById("topBar").style.background =
+          "linear-gradient(90deg," + accentColor + "," + secondary + "," + accentColor + ")";
+        // Only use team primary color for sidebar if it's dark enough
+        var lum = getLuminance(primary);
+        document.getElementById("sidebar").style.background = (lum < 0.12) ? primary : "#0a0a0a";
+        document.getElementById("sidebarBar").style.background = accentColor;
+        document.getElementById("cursor").style.background = accentColor;
+        document.getElementById("cursorTrail").style.borderColor = accentColor;
+
+        ["accentOv", "accentDrv", "accentOffer", "subAccentFin", "subAccentPerf", "formAccent", "subAccentIncoming"].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.style.background = accentColor;
+        });
+
+        var styleEl = document.getElementById("themeStyle");
+        if (!styleEl) {
+          styleEl = document.createElement("style");
+          styleEl.id = "themeStyle";
+          document.head.appendChild(styleEl);
+        }
+        var a = accentColor;
+
+        // Safe text accent: skip near-white colors that vanish on dark backgrounds
+        var textAc = (function () {
+          var th = team.theme;
+          if (a.startsWith("#") && getLuminance(a) > 0.7) {
+            var sec = th.secondary;
+            if (sec && sec.startsWith("#") && getLuminance(sec) <= 0.7) return sec;
+            var pri = th.primary;
+            if (pri && pri.startsWith("#") && getLuminance(pri) >= 0.05 && getLuminance(pri) <= 0.7) return pri;
+            return "#e10600";
+          }
+          return a;
+        })();
+
+        styleEl.textContent =
+          ".nav-link.active{border-left-color:" + a + "!important;color:" + textAc + "!important}" +
+          ".driver-row.selected{background:" + a + "12!important;border-left-color:" + a + "!important}" +
+          ".field input:focus,.field select:focus{border-color:" + a + "88!important}" +
+          ".btn-send{border-color:" + a + "55}" +
+          ".btn-send:hover:not(:disabled){background:" + a + "28!important;box-shadow:0 8px 24px " + a + "38!important}" +
+          ".card::before{background:radial-gradient(circle at 20% 20%," + a + "14,transparent 66%)!important}" +
+          ".driver-card::before{background:radial-gradient(circle at 20% 20%," + a + "12,transparent 66%)!important}" +
+          ".driver-card:hover{box-shadow:0 16px 32px " + a + "28!important}" +
+          ".selected-badge{background:" + a + "20;border-color:" + a + "44;color:" + a + "}" +
+          ".team-hero::after{background:radial-gradient(circle," + a + "09,transparent 70%)!important}" +
+          ".sidebar-bar{background:" + a + "!important}" +
+          ".team-hero-name{color:" + textAc + "!important}" +
+          ".sidebar-teamname{color:" + textAc + "!important}" +
+          ".section-title{color:" + textAc + "!important}" +
+          ".sub-title{color:" + textAc + "99!important}" +
+          ".card{border-left:3px solid " + a + "88!important}" +
+          ".driver-card{border-left:3px solid " + a + "88!important}" +
+          ".value{color:" + textAc + "!important}";
+      }
+
+      function applyFont(tid) {
+        var f = "Poppins, sans-serif";
+        if (tid === "MER01") f = "'Unity Sans', Poppins, sans-serif";
+        else if (tid === "RB01") f = "'RB Futura', Poppins, sans-serif";
+        document.body.style.fontFamily = f;
+      }
+
+      // ── Light / Dark mode ────────────────────────────────────────────────────
+      function applyThemeMode(mode) {
+        if (mode === "light") {
+          document.body.classList.add("light-mode");
+          document.getElementById("themeIcon").textContent = "🌙";
+          document.getElementById("themeLabel").textContent = " Dark Mode";
+        } else {
+          document.body.classList.remove("light-mode");
+          document.getElementById("themeIcon").textContent = "☀";
+          document.getElementById("themeLabel").textContent = " Light Mode";
+        }
+      }
+
+      var savedTheme = localStorage.getItem("themeMode") || "dark";
+      applyThemeMode(savedTheme);
+
+      document.getElementById("themeToggle").addEventListener("click", function () {
+        var next = document.body.classList.contains("light-mode") ? "dark" : "light";
+        localStorage.setItem("themeMode", next);
+        applyThemeMode(next);
+      });
+
+      // ── Nav wiring ───────────────────────────────────────────────────────────
+      function wireNav() {
+        document.querySelectorAll(".nav-link").forEach(function (link) {
+          link.addEventListener("click", function () {
+            document.querySelectorAll(".nav-link").forEach(function (l) {
+              l.classList.remove("active");
+              l.style.borderLeftColor = "";
+            });
+            this.classList.add("active");
+            this.style.borderLeftColor = accentColor;
+            document.querySelectorAll(".section").forEach(function (s) { s.classList.remove("active"); });
+            var t = document.getElementById(this.dataset.target);
+            if (t) t.classList.add("active");
+          });
+        });
+        document.getElementById("logoutBtn").addEventListener("click", function () {
+          localStorage.removeItem("loggedInTeam");
+          localStorage.removeItem("loggedInDriver");
+          location.replace("index.html");
+        });
+      }
+
+      // ── Fill Overview ────────────────────────────────────────────────────────
+      function fillOverview(team) {
+        // Hero
+        document.getElementById("heroTeamName").textContent = team.teamName || "—";
+        document.getElementById("heroTeamName").style.color = accentColor;
+        document.getElementById("heroShortName").textContent = team.shortName || "";
+        document.getElementById("heroChamps").textContent =
+          team.performance ? (team.performance.constructorChampionships || 0) : 0;
+
+        // Financial cards
+        var f = team.financial || {};
+        document.getElementById("ovBudget").textContent = fmt(f.annualBudget);
+        document.getElementById("ovCap").textContent = fmt(f.salaryCapAllocation);
+        document.getElementById("ovSponsor").textContent = fmt(f.sponsorRevenue);
+        document.getElementById("ovBonus").textContent = fmt(f.bonusPool);
+        document.getElementById("ovSigning").textContent = fmt(f.signingBonusAvailable);
+
+        // Performance cards
+        var p = team.performance || {};
+        document.getElementById("ovChamps").textContent = p.constructorChampionships != null ? p.constructorChampionships : "—";
+        document.getElementById("ovLastPos").textContent = p.lastSeasonPosition != null ? ordinal(p.lastSeasonPosition) : "—";
+        document.getElementById("ovDev").textContent = p.developmentIndex != null ? p.developmentIndex.toFixed(1) : "—";
+        document.getElementById("ovRel").textContent = p.reliabilityScore != null ? p.reliabilityScore.toFixed(1) : "—";
+        document.getElementById("ovAero").textContent = p.aeroEfficiency != null ? p.aeroEfficiency.toFixed(1) : "—";
+
+        // Sidebar name
+        document.getElementById("sidebarName").textContent = team.teamName || "—";
+      }
+
+      // ── Fill Current Drivers ─────────────────────────────────────────────────
+      function fillCurrentDrivers(team, allDrivers) {
+        var teamDrivers = allDrivers.filter(function (d) {
+          var cid = d.contract && d.contract.teamId;
+          var ct = d.personalDetails && d.personalDetails.currentTeam || "";
+          return (
+            cid === teamId ||
+            ct === team.teamName ||
+            ct === team.shortName ||
+            ct.includes(team.shortName || "") && team.shortName
+          );
+        });
+
+        var grid = document.getElementById("currentDriversGrid");
+
+        if (teamDrivers.length === 0) {
+          grid.innerHTML = '<div class="no-drivers-msg" style="grid-column:1/-1">No drivers currently registered for this team.</div>';
+          return;
+        }
+
+        // Sort by driver number
+        teamDrivers.sort(function (a, b) {
+          return ((a.personalDetails && a.personalDetails.driverNumber) || 99) -
+            ((b.personalDetails && b.personalDetails.driverNumber) || 99);
+        });
+
+        grid.innerHTML = teamDrivers.map(function (d) {
+          var pd = d.personalDetails || {};
+          var cs = d.careerStats || {};
+          var fin = d.financials || {};
+          var ctr = d.contract || {};
+          var salary = fin.annualSalary || ctr.baseSalary || 0;
+          var endYear = ctr.endDate ? ctr.endDate.substring(0, 4) : "—";
+          var endorsements = calcEndorsements(fin.endorsements);
+
+          return '<div class="driver-card">' +
+            '<div class="dc-number">' + (pd.driverNumber || "—") + '</div>' +
+            '<div class="dc-name">' + (pd.fullName || d.driverId) + '</div>' +
+            '<div class="dc-nationality">' + (pd.birthplace || "Unknown") + '</div>' +
+            '<div class="dc-salary">' + (salary ? fmt(salary) : "Undisclosed") + '</div>' +
+            '<div class="dc-salary-label">Annual Base Salary</div>' +
+            '<div class="dc-stats">' +
+            '<div class="dc-stat">' +
+            '<div class="dc-stat-val">' + (cs.wins || 0) + '</div>' +
+            '<div class="dc-stat-label">Wins</div>' +
+            '</div>' +
+            '<div class="dc-stat">' +
+            '<div class="dc-stat-val">' + (cs.podiums || 0) + '</div>' +
+            '<div class="dc-stat-label">Podiums</div>' +
+            '</div>' +
+            '<div class="dc-stat">' +
+            '<div class="dc-stat-val">' + (cs.worldChampionships || 0) + '</div>' +
+            '<div class="dc-stat-label">🏆 Titles</div>' +
+            '</div>' +
+            '<div class="dc-stat">' +
+            '<div class="dc-stat-val">' + (cs.polePositions || 0) + '</div>' +
+            '<div class="dc-stat-label">Poles</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="dc-footer">' +
+            '<span class="dc-contract-label">Contract until</span>' +
+            '<span class="dc-contract-val">' + endYear + '</span>' +
+            '</div>' +
+            '</div>';
+        }).join("");
+      }
+
+      // ── Fill Driver List (Send Offer panel) ───────────────────────────────────
+      var availableDrivers = [];
+      var selectedDriver = null;
+      var salaryCap = 0;
+
+      function fillDriverList(team, allDrivers) {
+        // Exclude drivers already on this team
+        availableDrivers = allDrivers.filter(function (d) {
+          var cid = d.contract && d.contract.teamId;
+          var ct = d.personalDetails && d.personalDetails.currentTeam || "";
+          return !(
+            cid === teamId ||
+            ct === team.teamName ||
+            ct === team.shortName ||
+            (team.shortName && ct.includes(team.shortName))
+          );
+        });
+
+        // Sort by wins desc
+        availableDrivers.sort(function (a, b) {
+          return ((b.careerStats && b.careerStats.wins) || 0) -
+            ((a.careerStats && a.careerStats.wins) || 0);
+        });
+
+        document.getElementById("driverCount").textContent =
+          availableDrivers.length + " driver" + (availableDrivers.length !== 1 ? "s" : "");
+
+        // Populate clickable list
+        var list = document.getElementById("driversList");
+        if (availableDrivers.length === 0) {
+          list.innerHTML = '<div style="padding:24px;text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem">No available drivers.</div>';
+        } else {
+          list.innerHTML = availableDrivers.map(function (d) {
+            var cs = d.careerStats || {};
+            var fin = d.financials || {};
+            var pd = d.personalDetails || {};
+            return '<div class="driver-row" data-driverid="' + d.driverId + '">' +
+              '<div class="driver-num">' + (pd.driverNumber || "—") + '</div>' +
+              '<div class="driver-info">' +
+              '<div class="driver-name">' + (pd.fullName || d.driverId) + '</div>' +
+              '<div class="driver-team">' + (pd.currentTeam || "Free Agent") + '</div>' +
+              '</div>' +
+              '<div class="driver-stats">' +
+              '<div class="driver-stat"><div class="ds-label">Wins</div><div class="ds-val">' + (cs.wins || 0) + '</div></div>' +
+              '<div class="driver-stat"><div class="ds-label">Pods</div><div class="ds-val">' + (cs.podiums || 0) + '</div></div>' +
+              '<div class="driver-stat"><div class="ds-label">🏆</div><div class="ds-val">' + (cs.worldChampionships || 0) + '</div></div>' +
+              '</div>' +
+              '<div class="driver-salary">' + (fin.annualSalary ? fmt(fin.annualSalary) : "—") + '</div>' +
+              '</div>';
+          }).join("");
+
+          list.querySelectorAll(".driver-row").forEach(function (row) {
+            row.addEventListener("click", function () {
+              var did = this.dataset.driverid;
+              var d = availableDrivers.find(function (dr) { return dr.driverId === did; });
+              if (d) {
+                selectDriver(d);
+                // Sync dropdown
+                document.getElementById("driverSelect").value = did;
+              }
+            });
+          });
+        }
+
+        // Populate dropdown
+        var sel = document.getElementById("driverSelect");
+        sel.innerHTML = '<option value="">— Select a driver —</option>' +
+          availableDrivers.map(function (d) {
+            var pd = d.personalDetails || {};
+            return '<option value="' + d.driverId + '">' +
+              '#' + (pd.driverNumber || "?") + ' ' + (pd.fullName || d.driverId) +
+              ' (' + (pd.currentTeam || "Free Agent") + ')' +
+              '</option>';
+          }).join("");
+
+        sel.addEventListener("change", function () {
+          var did = this.value;
+          if (!did) {
+            clearSelection();
+            return;
+          }
+          var d = availableDrivers.find(function (dr) { return dr.driverId === did; });
+          if (d) {
+            selectDriver(d);
+            // Sync list highlight
+            document.querySelectorAll(".driver-row").forEach(function (r) { r.classList.remove("selected"); });
+            var row = document.querySelector('[data-driverid="' + did + '"]');
+            if (row) { row.classList.add("selected"); row.scrollIntoView({ block: "nearest" }); }
+          }
+        });
+      }
+
+      function selectDriver(driver) {
+        selectedDriver = driver;
+        var pd = driver.personalDetails || {};
+
+        document.querySelectorAll(".driver-row").forEach(function (r) { r.classList.remove("selected"); });
+        var row = document.querySelector('[data-driverid="' + driver.driverId + '"]');
+        if (row) row.classList.add("selected");
+
+        var display = document.getElementById("selectedDriverDisplay");
+        display.innerHTML =
+          '<span class="selected-badge">Selected</span>' +
+          '<strong style="font-size:0.92rem">' + (pd.fullName || driver.driverId) + '</strong>' +
+          '<span style="font-size:0.72rem;color:rgba(255,255,255,0.38);margin-left:4px">' +
+          '#' + (pd.driverNumber || "?") + ' · ' + (pd.currentTeam || "Free Agent") +
+          '</span>';
+        display.classList.add("has-driver");
+
+        // Pre-fill salary
+        var curSalary = (driver.financials && driver.financials.annualSalary) || 0;
+        document.getElementById("inputSalary").value = curSalary || "";
+        updateCapHint();
+
+        var btn = document.getElementById("sendBtn");
+        btn.disabled = false;
+        btn.textContent = "Send Offer to " + ((pd.fullName || "Driver").split(" ").slice(-1)[0]);
+      }
+
+      function clearSelection() {
+        selectedDriver = null;
+        document.querySelectorAll(".driver-row").forEach(function (r) { r.classList.remove("selected"); });
+        var display = document.getElementById("selectedDriverDisplay");
+        display.textContent = "Select a driver from the list ←";
+        display.classList.remove("has-driver");
+        document.getElementById("inputSalary").value = "";
+        document.getElementById("inputBonus").value = "";
+        document.getElementById("inputSigning").value = "";
+        document.getElementById("inputLength").value = "2";
+        document.getElementById("capHint").textContent = "";
+        var btn = document.getElementById("sendBtn");
+        btn.disabled = true;
+        btn.textContent = "Select a Driver First";
+      }
+
+      function updateCapHint() {
+        var hint = document.getElementById("capHint");
+        var val = parseFloat(document.getElementById("inputSalary").value) || 0;
+        if (!salaryCap || !val) {
+          hint.textContent = salaryCap ? "Cap: " + fmt(salaryCap) : "";
+          hint.className = "cap-hint";
+          return;
+        }
+        if (val > salaryCap) {
+          hint.textContent = "⚠ Exceeds cap (" + fmt(salaryCap) + ") by " + fmt(val - salaryCap);
+          hint.className = "cap-hint over";
+        } else {
+          hint.textContent = fmt(salaryCap - val) + " remaining under cap";
+          hint.className = "cap-hint";
+        }
+      }
+
+      // ── Wire Send Offer button ────────────────────────────────────────────────
+      function wireSendBtn(team) {
+        document.getElementById("inputSalary").addEventListener("input", updateCapHint);
+
+        document.getElementById("sendBtn").addEventListener("click", function () {
+          if (!selectedDriver) { showToast("Select a driver first.", "error"); return; }
+
+          var salary = parseFloat(document.getElementById("inputSalary").value);
+          var bonus = parseFloat(document.getElementById("inputBonus").value) || 0;
+          var signing = parseFloat(document.getElementById("inputSigning").value) || 0;
+          var length = parseInt(document.getElementById("inputLength").value) || 1;
+
+          if (!salary || isNaN(salary) || salary <= 0) {
+            showToast("Please enter a valid base salary.", "error"); return;
+          }
+
+          var startYear = new Date().getFullYear() + 1;
+          var endYear = startYear + length - 1;
+          var contractId = "CTR" + Date.now();
+          var driverName = selectedDriver.personalDetails.fullName;
+
+          try {
+            createContract({
+              contractId: contractId,
+              teamId: teamId,
+              driverId: selectedDriver.driverId,
+              driverName: driverName,
+              teamName: team.teamName,
+              baseSalary: salary,
+              bonus: bonus,
+              signingBonus: signing,
+              contractLength: length,
+              startDate: startYear + "-01-01",
+              endDate: endYear + "-12-31",
+              devIndex: team.performance && team.performance.developmentIndex,
+              reliability: team.performance && team.performance.reliabilityScore,
+              status: "pending"
+            });
+
+            showToast("✓ Offer sent to " + driverName + "!", "success");
+            renderSentOffers(teamId);
+            fillIncomingDrivers(teamId);
+
+            // Reset
+            document.getElementById("driverSelect").value = "";
+            clearSelection();
+
+          } catch (e) {
+            showToast("Error: " + e.message, "error");
+          }
+        });
+      }
+
+      // ── Incoming Drivers (active contracts for this team) ────────────────────
+      function fillIncomingDrivers(tid) {
+        var contracts = getAllContracts().filter(function (c) {
+          return c.teamId === tid && c.status === "active";
+        });
+        var section = document.getElementById("incomingDriversSection");
+        var grid = document.getElementById("incomingDriversGrid");
+        if (contracts.length === 0) {
+          section.style.display = "none";
+          return;
+        }
+        section.style.display = "";
+        if (document.getElementById("subAccentIncoming")) {
+          document.getElementById("subAccentIncoming").style.background = accentColor;
+        }
+        grid.innerHTML = contracts.map(function (c) {
+          var durLabel = c.contractLength ? c.contractLength + " yr" + (c.contractLength !== 1 ? "s" : "") : "—";
+          var startYr = c.startDate ? c.startDate.substring(0,4) : "";
+          var endYr   = c.endDate   ? c.endDate.substring(0,4)   : "";
+          if (startYr && endYr) durLabel += " (" + startYr + "–" + endYr + ")";
+          return '<div class="driver-card">' +
+            '<div class="dc-name">' + (c.driverName || c.driverId) + '</div>' +
+            '<div class="dc-nationality">' + (c.driverId || "") + '</div>' +
+            '<div class="dc-salary">' + (c.baseSalary ? fmt(c.baseSalary) : "Undisclosed") + '</div>' +
+            '<div class="dc-salary-label">Base Salary · ' + durLabel + '</div>' +
+            '<div class="dc-footer" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between">' +
+            '<span class="dc-contract-label">Status</span>' +
+            '<span class="incoming-badge"><span class="incoming-dot"></span> Contract Accepted</span>' +
+            '</div>' +
+            '</div>';
+        }).join("");
+      }
+
+      // ── Sent Offers Tracker ───────────────────────────────────────────────────
+      function renderSentOffers(tid) {
+        var contracts = getAllContracts().filter(function (c) { return c.teamId === tid; });
+        var listEl = document.getElementById("sentOffersList");
+        var countEl = document.getElementById("offersCount");
+        countEl.textContent = contracts.length + " offer" + (contracts.length !== 1 ? "s" : "");
+        if (contracts.length === 0) {
+          listEl.innerHTML = '<div class="no-offers-msg">No offers sent yet.</div>';
+          return;
+        }
+        // Most recent first (by contractId timestamp suffix)
+        contracts = contracts.slice().reverse();
+        listEl.innerHTML = contracts.map(function (c) {
+          var dotClass = "dot-" + (c.status || "pending");
+          var statusClass = c.status || "pending";
+          var durLabel = c.contractLength ? c.contractLength + " yr" : "—";
+          var startYr = c.startDate ? c.startDate.substring(0,4) : "";
+          var endYr   = c.endDate   ? c.endDate.substring(0,4)   : "";
+          if (startYr && endYr) durLabel += " (" + startYr + "–" + endYr + ")";
+          return '<div class="sent-offer-row">' +
+            '<span class="status-dot ' + dotClass + '"></span>' +
+            '<span class="so-driver">' + (c.driverName || c.driverId) + '</span>' +
+            '<span class="so-salary">' + (c.baseSalary ? fmt(c.baseSalary) : "—") + '</span>' +
+            '<span class="so-length">' + durLabel + '</span>' +
+            '<span class="so-status ' + statusClass + '">' + statusClass + '</span>' +
+            '</div>';
+        }).join("");
+      }
+
+      // ── Boot ─────────────────────────────────────────────────────────────────
+      async function boot() {
+        try {
+          var results = await Promise.all([
+            fetch("backend/f1_teams_dataset.json").then(function (r) { return r.json(); }),
+            fetch("backend/f1_2025_drivers_Dataset.json").then(function (r) { return r.json(); })
+          ]);
+
+          var teamsRaw = results[0];
+          var driversRaw = results[1];
+
+          var allTeams = Array.isArray(teamsRaw) ? teamsRaw : (teamsRaw.teams || []);
+          var allDrivers = Array.isArray(driversRaw) ? driversRaw : (driversRaw.drivers || []);
+
+          seedContracts();
+
+          var team = allTeams.find(function (t) { return t.teamId === teamId; });
+          if (!team) {
+            document.getElementById("loadingScreen").style.display = "none";
+            document.getElementById("errorMsg").textContent = 'No team found with teamId "' + teamId + '".';
+            document.getElementById("errorScreen").classList.add("show");
+            return;
+          }
+
+          applyTheme(team);
+          applyFont(team.teamId);
+
+          document.title = "F1 Team Dashboard — " + team.teamName;
+          salaryCap = (team.financial && team.financial.salaryCapAllocation) || 0;
+
+          fillOverview(team);
+          fillCurrentDrivers(team, allDrivers);
+          fillIncomingDrivers(teamId);
+          fillDriverList(team, allDrivers);
+          renderSentOffers(teamId);
+          wireSendBtn(team);
+          wireNav();
+
+          document.getElementById("loadingScreen").style.display = "none";
+          document.getElementById("layout").style.visibility = "visible";
+
+        } catch (err) {
+          console.error(err);
+          document.getElementById("loadingText").textContent = "Error: " + err.message;
+        }
+      }
+
+      boot();
+    })();
+  </script>
+</body>
+
+</html>

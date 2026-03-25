@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Contract Intelligence — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #000000;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(225, 6, 0, 0.18) 0%, transparent 52%),
+        radial-gradient(ellipse at 80% 100%, rgba(0, 255, 213, 0.08) 0%, transparent 48%),
+        radial-gradient(ellipse at 50% 50%, rgba(14, 14, 20, 0.9) 0%, #000 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #e10600, #ff4433, #e10600);
+      z-index: 10;
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    /* ── Branding ── */
+    .brand {
+      text-align: center;
+      animation: fadeInUp 0.7s ease-out both;
+    }
+
+    .brand-flag {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .flag-stripe {
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    .flag-stripe.red {
+      width: 36px;
+      background: #e10600;
+    }
+
+    .flag-stripe.white {
+      width: 20px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .flag-stripe.red2 {
+      width: 36px;
+      background: #e10600;
+    }
+
+    .brand-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1.15;
+    }
+
+    .brand-sub {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      font-weight: 400;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.38);
+    }
+
+    /* ── Card ── */
+    .card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 0 0 32px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+      animation: fadeInUp 0.75s ease-out 0.1s both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: -40px;
+      left: -40px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(225, 6, 0, 0.1), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── Mode tabs ── */
+    .mode-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 0;
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 18px 16px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      text-align: center;
+      user-select: none;
+    }
+
+    .mode-tab:first-child {
+      border-radius: 24px 0 0 0;
+    }
+
+    .mode-tab:last-child {
+      border-radius: 0 24px 0 0;
+    }
+
+    .mode-tab:hover {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .mode-tab.active {
+      color: #fff;
+      border-bottom-color: #e10600;
+    }
+
+    /* ── Tab panels ── */
+    .tab-panel {
+      display: none;
+      padding: 28px 36px 0;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.3px;
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.38);
+      font-weight: 300;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* ── Form ── */
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 0.92rem;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      -webkit-appearance: none;
+    }
+
+    .input::placeholder {
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: rgba(225, 6, 0, 0.7);
+      box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.12);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .input.error {
+      border-color: rgba(255, 100, 80, 0.6);
+      box-shadow: 0 0 0 3px rgba(255, 80, 60, 0.1);
+    }
+
+    .select option {
+      background: #111;
+      color: #fff;
+    }
+
+    .error-msg {
+      display: none;
+      background: rgba(225, 6, 0, 0.12);
+      border: 1px solid rgba(225, 6, 0, 0.3);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 0.8rem;
+      color: #ff7a6e;
+      line-height: 1.45;
+      animation: shake 0.35s ease;
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    .button {
+      width: 100%;
+      margin-top: 4px;
+      padding: 14px 24px;
+      background: #e10600;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .button:hover {
+      background: #c80500;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(225, 6, 0, 0.45);
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .button-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .spinner {
+      display: none;
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .button.loading .spinner {
+      display: block;
+    }
+
+    .button.loading .btn-text {
+      opacity: 0.7;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 14px 0 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .divider-label {
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.22);
+    }
+
+    /* ── Hints ── */
+    .hint {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      padding: 18px 22px;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .hint-title {
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.25);
+      margin-bottom: 12px;
+    }
+
+    .hint-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .hint-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s;
+    }
+
+    .hint-item:hover {
+      background: rgba(225, 6, 0, 0.06);
+      border-color: rgba(225, 6, 0, 0.2);
+    }
+
+    .hint-driver {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .hint-team {
+      font-size: 0.66rem;
+      color: rgba(255, 255, 255, 0.28);
+      margin-top: 2px;
+    }
+
+    .hint-pass {
+      margin-top: 12px;
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.22);
+    }
+
+    .hint-pass span {
+      font-weight: 600;
+      color: rgba(0, 255, 213, 0.55);
+      font-family: "Courier New", monospace;
+      letter-spacing: 1px;
+    }
+
+    /* Team hint panel */
+    .hint-panel {
+      display: none;
+    }
+
+    .hint-panel.active {
+      display: block;
+    }
+
+    .footer {
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.16);
+      letter-spacing: 0.5px;
+      text-align: center;
+      animation: fadeInUp 0.85s ease-out 0.3s both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      20% {
+        transform: translateX(-6px)
+      }
+
+      40% {
+        transform: translateX(6px)
+      }
+
+      60% {
+        transform: translateX(-4px)
+      }
+
+      80% {
+        transform: translateX(4px)
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── Cursor ── */
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e10600;
+      pointer-events: none;
+      z-index: 100000;
+      transform: translate(-50%, -50%);
+    }
+
+    .cursor-trail {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid rgba(225, 6, 0, 0.4);
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+    }
+
+    @media (max-width: 520px) {
+      .tab-panel {
+        padding: 22px 22px 0;
+      }
+
+      .brand-title {
+        font-size: 1.25rem;
+      }
+
+      .hint-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cursor,
+      .cursor-trail {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-bar"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-trail" id="cursorTrail"></div>
+
+  <div class="page-wrapper">
+
+    <!-- Branding -->
+    <div class="brand">
+      <div class="brand-flag">
+        <div class="flag-stripe red"></div>
+        <div class="flag-stripe white"></div>
+        <div class="flag-stripe red2"></div>
+      </div>
+      <h1 class="brand-title">F1 Contract Intelligence</h1>
+      <p class="brand-sub">Driver &amp; Team Manager Portal &mdash; 2025 Season</p>
+    </div>
+
+    <!-- Login card -->
+    <div class="card">
+
+      <!-- Mode tabs -->
+      <div class="mode-tabs">
+        <div class="mode-tab active" id="tabDriver" data-mode="driver">Driver Login</div>
+        <div class="mode-tab" id="tabManager" data-mode="manager">Team Manager</div>
+        <div class="mode-tab" id="tabFantasy" data-mode="fantasy">Fantasy</div>
+      </div>
+
+      <!-- Driver panel -->
+      <div class="tab-panel active" id="panelDriver">
+        <p class="card-title">Driver Sign In</p>
+        <p class="card-desc">Access your contract analytics, financial profile, and team intelligence dashboard.</p>
+
+        <form class="form" id="driverForm" novalidate>
+          <div class="field">
+            <label class="label" for="usernameInput">Username</label>
+            <input class="input" id="usernameInput" type="text" placeholder="e.g. maxverstappen" autocomplete="username"
+              spellcheck="false" autocapitalize="none">
+          </div>
+          <div class="field">
+            <label class="label" for="passwordInput">Password</label>
+            <input class="input" id="passwordInput" type="password" placeholder="Enter your password"
+              autocomplete="current-password">
+          </div>
+          <div class="error-msg" id="driverError">Invalid username or password.</div>
+          <button class="button" id="driverBtn" type="submit">
+            <div class="button-inner">
+              <div class="spinner"></div>
+              <span class="btn-text">Sign In as Driver</span>
+            </div>
+          </button>
+        </form>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-label">Sample credentials</span>
+          <div class="divider-line"></div>
+        </div>
+      </div>
+
+      <!-- Team Manager panel -->
+      <div class="tab-panel" id="panelManager">
+        <p class="card-title">Team Manager Access</p>
+        <p class="card-desc">Send contract offers and manage your team's driver roster and recruitment.</p>
+
+        <form class="form" id="managerForm" novalidate>
+          <div class="field">
+            <label class="label" for="teamSelect">Select Team</label>
+            <select class="select" id="teamSelect">
+              <option value="">Loading teams…</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="managerPassword">Manager Password</label>
+            <input class="input" id="managerPassword" type="password" placeholder="Enter manager password"
+              autocomplete="current-password">
+          </div>
+          <div class="error-msg" id="managerError">Incorrect password or no team selected.</div>
+          <button class="button" id="managerBtn" type="submit">
+            <div class="button-inner">
+              <div class="spinner"></div>
+              <span class="btn-text">Enter Team Portal</span>
+            </div>
+          </button>
+        </form>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-label">Manager credentials</span>
+          <div class="divider-line"></div>
+        </div>
+      </div>
+
+      <!-- Fantasy panel -->
+      <div class="tab-panel" id="panelFantasy">
+        <p class="card-title">Fantasy Portal</p>
+        <p class="card-desc">Access the F1 Fantasy dashboard — compare all 20 drivers and 10 teams with live metrics,
+          standings, and head-to-head analysis.</p>
+
+        <form class="form" id="fantasyForm" novalidate>
+          <div class="field">
+            <label class="label" for="fantasyUser">Username</label>
+            <input class="input" id="fantasyUser" type="text" placeholder="e.g. admin" autocomplete="username"
+              spellcheck="false" autocapitalize="none">
+          </div>
+          <div class="field">
+            <label class="label" for="fantasyPass">Password</label>
+            <input class="input" id="fantasyPass" type="password" placeholder="Enter password"
+              autocomplete="current-password">
+          </div>
+          <div class="error-msg" id="fantasyError">Invalid username or password.</div>
+          <button class="button" id="fantasyBtn" type="submit">
+            <div class="button-inner">
+              <div class="spinner"></div>
+              <span class="btn-text">Enter Fantasy Portal</span>
+            </div>
+          </button>
+        </form>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-label">Sample credentials</span>
+          <div class="divider-line"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Hints block — switches with tabs -->
+    <div class="hint">
+
+      <!-- Driver hints -->
+      <div class="hint-panel active" id="hintDriver">
+        <p class="hint-title">Test accounts — click to autofill</p>
+        <div class="hint-grid">
+          <div class="hint-item" data-user="maxverstappen">
+            <p class="hint-driver">maxverstappen</p>
+            <p class="hint-team">Red Bull Racing · DRV01</p>
+          </div>
+          <div class="hint-item" data-user="georgerussell">
+            <p class="hint-driver">georgerussell</p>
+            <p class="hint-team">Mercedes · DRV63</p>
+          </div>
+          <div class="hint-item" data-user="landonorris">
+            <p class="hint-driver">landonorris</p>
+            <p class="hint-team">McLaren · DRV04</p>
+          </div>
+          <div class="hint-item" data-user="lewishamilton">
+            <p class="hint-driver">lewishamilton</p>
+            <p class="hint-team">Scuderia Ferrari · DRV44</p>
+          </div>
+        </div>
+        <p class="hint-pass">Universal password: <span>f1@2025</span></p>
+      </div>
+
+      <!-- Manager hints -->
+      <div class="hint-panel" id="hintManager">
+        <p class="hint-title">Team manager access</p>
+        <div class="hint-grid">
+          <div class="hint-item" data-team="RB01">
+            <p class="hint-driver">Red Bull Racing</p>
+            <p class="hint-team">teamId: RB01</p>
+          </div>
+          <div class="hint-item" data-team="MER01">
+            <p class="hint-driver">Mercedes AMG</p>
+            <p class="hint-team">teamId: MER01</p>
+          </div>
+          <div class="hint-item" data-team="MCL01">
+            <p class="hint-driver">McLaren F1 Team</p>
+            <p class="hint-team">teamId: MCL01</p>
+          </div>
+          <div class="hint-item" data-team="FER01">
+            <p class="hint-driver">Scuderia Ferrari</p>
+            <p class="hint-team">teamId: FER01</p>
+          </div>
+        </div>
+        <p class="hint-pass">Manager password: <span>f1team@2025</span></p>
+      </div>
+
+      <!-- Fantasy hints -->
+      <div class="hint-panel" id="hintFantasy">
+        <p class="hint-title">Fantasy accounts — click to autofill</p>
+        <div class="hint-grid">
+          <div class="hint-item" data-fuser="admin" data-fpass="fantasy2025">
+            <p class="hint-driver">admin</p>
+            <p class="hint-team">Full access · all metrics</p>
+          </div>
+          <div class="hint-item" data-fuser="guest" data-fpass="f1fan">
+            <p class="hint-driver">guest</p>
+            <p class="hint-team">Viewer · read-only</p>
+          </div>
+          <div class="hint-item" data-fuser="viewer" data-fpass="grid2025">
+            <p class="hint-driver">viewer</p>
+            <p class="hint-team">Grid view · standings only</p>
+          </div>
+        </div>
+        <p class="hint-pass">Passwords vary per account — click a tile to autofill</p>
+      </div>
+
+    </div>
+
+    <p class="footer">F1 Contract Intelligence Dashboard &copy; 2026 &mdash; Simulation data only</p>
+
+  </div>
+
+  <script>
+    (function () {
+      var cur = document.getElementById("cursor");
+      var trail = document.getElementById("cursorTrail");
+      var mx = 0, my = 0, tx = 0, ty = 0;
+      document.addEventListener("mousemove", function (e) { mx = e.clientX; my = e.clientY; cur.style.left = mx + "px"; cur.style.top = my + "px"; });
+      (function loop() { tx += (mx - tx) * 0.1; ty += (my - ty) * 0.1; trail.style.left = tx + "px"; trail.style.top = ty + "px"; requestAnimationFrame(loop); })();
+
+      var currentMode = "driver";
+      document.querySelectorAll(".mode-tab").forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          var mode = this.dataset.mode;
+          if (mode === currentMode) return;
+          currentMode = mode;
+
+          document.querySelectorAll(".mode-tab").forEach(function (t) { t.classList.remove("active"); });
+          document.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.remove("active"); });
+          document.querySelectorAll(".hint-panel").forEach(function (p) { p.classList.remove("active"); });
+
+          this.classList.add("active");
+          var cap = mode.charAt(0).toUpperCase() + mode.slice(1);
+          document.getElementById("panel" + cap).classList.add("active");
+          document.getElementById("hint" + cap).classList.add("active");
+
+          // Clear errors
+          document.getElementById("driverError").classList.remove("visible");
+          document.getElementById("managerError").classList.remove("visible");
+          document.getElementById("fantasyError").classList.remove("visible");
+        });
+      });
+
+      var teamsCache = [];
+      fetch("backend/f1_teams_dataset.json").then(function (r) { return r.json(); }).then(function (data) {
+        teamsCache = Array.isArray(data) ? data : (data.teams || []);
+        var sel = document.getElementById("teamSelect");
+        sel.innerHTML = '<option value="">— Select a team —</option>' +
+          teamsCache.map(function (t) {
+            return '<option value="' + t.teamId + '">' + t.teamName + '</option>';
+          }).join("");
+      }).catch(function () { document.getElementById("teamSelect").innerHTML = '<option value="">Failed to load teams</option>'; });
+
+      document.querySelectorAll(".hint-item[data-user]").forEach(function (item) {
+        item.addEventListener("click", function () {
+          document.getElementById("usernameInput").value = this.dataset.user;
+          document.getElementById("passwordInput").value = "f1@2025";
+          document.getElementById("driverError").classList.remove("visible");
+        });
+      });
+
+      document.querySelectorAll(".hint-item[data-team]").forEach(function (item) {
+        item.addEventListener("click", function () {
+          if (currentMode !== "manager") {
+            document.getElementById("tabManager").click();
+          }
+          var sel = document.getElementById("teamSelect");
+          sel.value = this.dataset.team;
+          document.getElementById("managerPassword").value = "f1team@2025";
+          document.getElementById("managerError").classList.remove("visible");
+        });
+      });
+
+      var driverForm = document.getElementById("driverForm");
+      var driverBtn = document.getElementById("driverBtn");
+      var driverErr = document.getElementById("driverError");
+      var uInput = document.getElementById("usernameInput");
+      var pInput = document.getElementById("passwordInput");
+
+      function showDriverError(msg) { driverErr.textContent = msg; driverErr.classList.add("visible"); }
+      function hideDriverError() { driverErr.classList.remove("visible"); }
+
+      uInput.addEventListener("input", function () { uInput.classList.remove("error"); hideDriverError(); });
+      pInput.addEventListener("input", function () { pInput.classList.remove("error"); hideDriverError(); });
+
+      driverForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        hideDriverError();
+        var username = uInput.value.trim().toLowerCase();
+        var password = pInput.value;
+
+        if (!username || !password) { showDriverError("Please enter both username and password."); return; }
+        if (password !== "f1@2025") {
+          showDriverError("Incorrect password. Use f1@2025 for all driver accounts.");
+          pInput.classList.add("error"); return;
+        }
+
+        driverBtn.disabled = true;
+        driverBtn.classList.add("loading");
+
+        try {
+          var res = await fetch("backend/f1_2025_drivers_Dataset.json");
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          var data = await res.json();
+          var drivers = Array.isArray(data) ? data : (data.drivers || []);
+          var driver = drivers.find(function (d) { return d.account.username.toLowerCase() === username; });
+
+          if (!driver) {
+            showDriverError("Username not found. Try one of the sample accounts below.");
+            uInput.classList.add("error"); return;
+          }
+
+          localStorage.setItem("loggedInDriver", driver.driverId);
+          localStorage.setItem("loggedInUsername", username);
+          localStorage.removeItem("loggedInTeam");
+
+          driverBtn.querySelector(".btn-text").textContent = "Redirecting…";
+          setTimeout(function () { location.href = "dashboard.html"; }, 500);
+
+        } catch (err) {
+          showDriverError("Could not load driver data. Make sure backend/ is accessible.");
+          console.error(err);
+        } finally {
+          if (driverBtn.disabled && driverBtn.querySelector(".btn-text").textContent !== "Redirecting…") {
+            driverBtn.disabled = false;
+            driverBtn.classList.remove("loading");
+          }
+        }
+      });
+
+      var managerForm = document.getElementById("managerForm");
+      var managerBtn = document.getElementById("managerBtn");
+      var managerErr = document.getElementById("managerError");
+      var teamSel = document.getElementById("teamSelect");
+      var mPassInput = document.getElementById("managerPassword");
+
+      function showManagerError(msg) { managerErr.textContent = msg; managerErr.classList.add("visible"); }
+      function hideManagerError() { managerErr.classList.remove("visible"); }
+
+      mPassInput.addEventListener("input", hideManagerError);
+      teamSel.addEventListener("change", hideManagerError);
+
+      managerForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        hideManagerError();
+
+        var selectedTeamId = teamSel.value;
+        var password = mPassInput.value;
+
+        if (!selectedTeamId) { showManagerError("Please select a team."); return; }
+        if (!password) { showManagerError("Please enter the manager password."); return; }
+        if (password !== "f1team@2025") {
+          showManagerError("Incorrect manager password. Use f1team@2025.");
+          mPassInput.classList.add("error"); return;
+        }
+
+        localStorage.setItem("loggedInTeam", selectedTeamId);
+        localStorage.removeItem("loggedInDriver");
+
+        managerBtn.disabled = true;
+        managerBtn.classList.add("loading");
+        managerBtn.querySelector(".btn-text").textContent = "Redirecting…";
+
+        setTimeout(function () { location.href = "team.html?teamId=" + selectedTeamId; }, 500);
+      });
+
+      mPassInput.addEventListener("input", function () { mPassInput.classList.remove("error"); });
+
+      document.querySelectorAll(".hint-item[data-fuser]").forEach(function (item) {
+        item.addEventListener("click", function () {
+          if (currentMode !== "fantasy") {
+            document.getElementById("tabFantasy").click();
+          }
+          document.getElementById("fantasyUser").value = this.dataset.fuser;
+          document.getElementById("fantasyPass").value = this.dataset.fpass;
+          document.getElementById("fantasyError").classList.remove("visible");
+        });
+      });
+
+      var FANTASY_CREDS = { "admin": "fantasy2025", "guest": "f1fan", "viewer": "grid2025" };
+      var fantasyForm = document.getElementById("fantasyForm");
+      var fantasyBtn = document.getElementById("fantasyBtn");
+      var fantasyErr = document.getElementById("fantasyError");
+      var fUser = document.getElementById("fantasyUser");
+      var fPass = document.getElementById("fantasyPass");
+
+      fUser.addEventListener("input", function () { fUser.classList.remove("error"); fantasyErr.classList.remove("visible"); });
+      fPass.addEventListener("input", function () { fPass.classList.remove("error"); fantasyErr.classList.remove("visible"); });
+
+      fantasyForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var username = fUser.value.trim().toLowerCase();
+        var password = fPass.value;
+
+        if (!username || !password) {
+          fantasyErr.textContent = "Please enter both username and password.";
+          fantasyErr.classList.add("visible"); return;
+        }
+        if (!FANTASY_CREDS[username] || FANTASY_CREDS[username] !== password) {
+          fantasyErr.textContent = "Invalid username or password.";
+          fantasyErr.classList.add("visible");
+          fUser.classList.add("error"); fPass.classList.add("error"); return;
+        }
+
+        localStorage.setItem("fantasyUser", username);
+        fantasyBtn.disabled = true;
+        fantasyBtn.classList.add("loading");
+        fantasyBtn.querySelector(".btn-text").textContent = "Redirecting…";
+        setTimeout(function () { location.href = "fantasy.html"; }, 500);
+      });
+
+    })();
+  </script>
+</body>
+
+</html>

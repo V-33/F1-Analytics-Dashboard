@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 — Incoming Offers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="contracts.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      color: #f4f8ff;
+      background: radial-gradient(circle at 8% -8%, #1a2741 0%, #071428 45%, #050d1d 100%);
+      min-height: 100vh;
+    }
+
+    .top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #db0a40;
+      z-index: 100;
+    }
+
+    .page {
+      width: min(1000px, 94%);
+      margin: 42px auto 60px;
+      padding-top: 8px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .header-left {
+      flex: 1;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.45);
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .title {
+      font-size: clamp(1.25rem, 2.4vw, 1.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: #a8b5ca;
+      font-size: 0.9rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: #a8b5ca;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 6px 14px;
+      white-space: nowrap;
+      margin-top: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      flex-shrink: 0;
+    }
+
+    /* ── Section header ── */
+    .section {
+      margin-top: 8px;
+    }
+
+    .head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .bar {
+      width: 6px;
+      height: 28px;
+      border-radius: 5px;
+      background: #db0a40;
+      flex-shrink: 0;
+    }
+
+    .head-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    /* ── Grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    @media (max-width: 680px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Offer card ── */
+    .card {
+      background: rgba(16, 30, 52, 0.62);
+      border: 1px solid rgba(219, 10, 64, 0.28);
+      border-radius: 16px;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(219, 10, 64, 0.15);
+    }
+
+    /* Team row */
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .team-info {
+      flex: 1;
+    }
+
+    .teamname {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .team-meta {
+      font-size: 0.75rem;
+      color: #a8b5ca;
+      margin-top: 2px;
+    }
+
+    .offer-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #f59e0b;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    /* Metrics */
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .metric {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 12px;
+    }
+
+    .label {
+      color: #a8b5ca;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .value {
+      margin-top: 4px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .gold {
+      color: #b8aa76;
+    }
+
+    /* Card footer */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .contract-id {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .button {
+      text-decoration: none;
+      color: #f4f8ff;
+      border: 1px solid rgba(219, 10, 64, 0.4);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: linear-gradient(130deg, rgba(219, 10, 64, 0.12), rgba(219, 10, 64, 0.04));
+      transition: background 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .button:hover {
+      background: linear-gradient(130deg, rgba(219, 10, 64, 0.24), rgba(219, 10, 64, 0.1));
+      border-color: rgba(219, 10, 64, 0.65);
+    }
+
+    /* ── Empty / error states ── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 56px 20px;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.95rem;
+    }
+
+    .empty strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    /* ── Header status right ── */
+    .header-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) {
+      .header {
+        flex-direction: column;
+      }
+
+      .header-right {
+        text-align: left;
+      }
+    }
+
+    /* ── Theme toggle ── */
+    .btn-theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 13px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.65);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s;
+      margin-top: 8px;
+    }
+    .btn-theme-toggle:hover { background: rgba(255,255,255,0.13); color: #fff; }
+
+    /* ══════════════════════════
+       LIGHT MODE
+    ══════════════════════════ */
+    body.light-mode {
+      background: #f0f2f5;
+      color: #111;
+    }
+    body.light-mode .top { background: #db0a40; }
+    body.light-mode .title { color: #111; }
+    body.light-mode .subtitle { color: rgba(0,0,0,0.55); }
+    body.light-mode .back-link { color: rgba(0,0,0,0.45); }
+    body.light-mode .back-link:hover { color: rgba(0,0,0,0.8); }
+    body.light-mode .status-pill { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.6); }
+    body.light-mode .btn-theme-toggle { background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.14); color: rgba(0,0,0,0.65); }
+    body.light-mode .btn-theme-toggle:hover { background: rgba(0,0,0,0.12); color: #111; }
+    body.light-mode .head-title { color: rgba(0,0,0,0.6); }
+    body.light-mode .line { background: rgba(0,0,0,0.12); }
+    body.light-mode .card {
+      background: rgba(255,255,255,0.9);
+      border-color: rgba(219,10,64,0.2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    body.light-mode .card:hover { box-shadow: 0 12px 28px rgba(219,10,64,0.1); }
+    body.light-mode .teamname { color: #111; }
+    body.light-mode .team-meta { color: rgba(0,0,0,0.5); }
+    body.light-mode .label { color: rgba(0,0,0,0.5); }
+    body.light-mode .value { color: #111; }
+    body.light-mode .gold { color: #7a6a2a; }
+    body.light-mode .metric { border-color: rgba(0,0,0,0.08); background: rgba(0,0,0,0.03); }
+    body.light-mode .contract-id { color: rgba(0,0,0,0.35); }
+    body.light-mode .empty { color: rgba(0,0,0,0.35); }
+    body.light-mode .empty strong { color: rgba(0,0,0,0.5); }
+  </style>
+</head>
+
+<body>
+  <div class="top"></div>
+
+  <main class="page">
+    <header class="header">
+      <div class="header-left">
+        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+        <h1 class="title" id="pageTitle">INCOMING CONTRACT OFFERS</h1>
+        <p class="subtitle">Pending offers available for contract intelligence analysis.</p>
+      </div>
+      <div class="header-right">
+        <div class="status-pill">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Loading…</span>
+        </div>
+        <button class="btn-theme-toggle" id="themeToggle">
+          <span id="themeIcon">☀</span><span id="themeLabel"> Light Mode</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="head">
+        <span class="bar"></span>
+        <h2 class="head-title">Offers</h2>
+        <span class="line"></span>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      // ── Auth guard ─────────────────────────────────────────────────────────
+      var driverId = localStorage.getItem("loggedInDriver");
+      if (!driverId) { location.replace("index.html"); return; }
+
+      var statusDot = document.getElementById("statusDot");
+      var statusText = document.getElementById("statusText");
+      var grid = document.getElementById("grid");
+
+      function setStatus(msg, ok) {
+        statusText.textContent = msg;
+        statusDot.style.background = ok === false ? "#e10600" : ok === true ? "#22c55e" : "#f59e0b";
+      }
+
+      function fmt(n) {
+        if (!n && n !== 0) return "N/A";
+        return new Intl.NumberFormat("en-US", {
+          style: "currency", currency: "USD",
+          notation: "compact", maximumFractionDigits: 1
+        }).format(n);
+      }
+
+      async function boot() {
+        try {
+          setStatus("Loading…", null);
+
+          var results = await Promise.all([
+            fetch("backend/f1_2025_drivers_Dataset.json").then(function (r) { return r.json(); }),
+            fetch("backend/f1_teams_dataset.json").then(function (r) { return r.json(); })
+          ]);
+
+          var driversRaw = results[0];
+          var teamsRaw = results[1];
+
+          var drivers = Array.isArray(driversRaw) ? driversRaw : (driversRaw.drivers || []);
+          var allTeams = Array.isArray(teamsRaw) ? teamsRaw : (teamsRaw.teams || []);
+
+          // Seed sample contracts into localStorage on first run
+          seedContracts();
+
+          // Find logged-in driver
+          var driver = drivers.find(function (d) { return d.driverId === driverId; });
+          if (!driver) {
+            setStatus("Driver not found.", false);
+            grid.innerHTML = '<div class="empty"><strong>Error</strong>Could not find your driver profile. Please log in again.</div>';
+            return;
+          }
+
+          var fullName = driver.personalDetails.fullName || driverId;
+
+          // Update page title
+          document.getElementById("pageTitle").textContent = fullName.toUpperCase() + " — OFFERED CONTRACTS";
+          document.title = fullName + " — Incoming Offers";
+
+          // Get pending contracts for this driver
+          var offers = getContractsForDriver(driverId).filter(function (c) { return c.status === "pending" || c.status === "negotiating"; });
+
+          if (offers.length === 0) {
+            setStatus("No offers found.", false);
+            grid.innerHTML = '<div class="empty"><strong>No pending offers</strong>You have no incoming contract offers at this time.</div>';
+            return;
+          }
+
+          setStatus(offers.length + " offer" + (offers.length === 1 ? "" : "s") + " found", true);
+
+          // Build cards
+          grid.innerHTML = offers.map(function (offer) {
+            var offerTeam = allTeams.find(function (t) { return t.teamId === offer.teamId; });
+            var teamName = offer.teamName || (offerTeam ? offerTeam.teamName : offer.teamId);
+            var lastPos = offerTeam ? ("P" + (offerTeam.performance.lastSeasonPosition || "—")) : "—";
+            var teamAccent = pickTeamAccent(offerTeam);
+
+            return '<article class="card" style="border-left:3px solid ' + teamAccent + '">' +
+              '<div class="team">' +
+              '<div class="team-info">' +
+              '<div class="teamname" style="color:' + teamAccent + '">' + teamName + '</div>' +
+              '<div class="team-meta">' + lastPos + ' last season</div>' +
+              '</div>' +
+              '<span class="offer-badge">' + offer.status + '</span>' +
+              '</div>' +
+
+              '<div class="meta">' +
+              '<div class="metric"><div class="label">Base Salary</div><div class="value gold">' + fmt(offer.baseSalary) + '</div></div>' +
+              '<div class="metric"><div class="label">Champ Bonus</div><div class="value">' + fmt(offer.bonus) + '</div></div>' +
+              '<div class="metric"><div class="label">Signing Bonus</div><div class="value gold">' + fmt(offer.signingBonus) + '</div></div>' +
+              '<div class="metric"><div class="label">Dev Index</div><div class="value">' + (offer.devIndex != null ? offer.devIndex.toFixed(1) + " / 10" : "—") + '</div></div>' +
+              '<div class="metric"><div class="label">Reliability</div><div class="value">' + (offer.reliability != null ? offer.reliability.toFixed(1) + " / 10" : "—") + '</div></div>' +
+              '<div class="metric"><div class="label">Contract Length</div><div class="value">' + (offer.contractLength ? offer.contractLength + " years" : "—") + '</div></div>' +
+              '</div>' +
+
+              '<div class="card-footer">' +
+              '<span class="contract-id">' + offer.contractId + '</span>' +
+              '<a class="button" href="offer_compare.html?contractId=' + offer.contractId + '">View Full Comparison →</a>' +
+              '</div>' +
+              '</article>';
+          }).join("");
+
+        } catch (err) {
+          console.error(err);
+          setStatus("Failed to load.", false);
+          grid.innerHTML = '<div class="empty"><strong>Error</strong>' + err.message + '</div>';
+        }
+      }
+
+      // ── Pick safe accent per team (excludes near-white/near-black) ──────────
+      function pickTeamAccent(team) {
+        if (!team || !team.theme) return "#db0a40";
+        var neutral = { "#ffffff": 1, "#000000": 1, "#0a0a0a": 1, "#000": 1, "#fff": 1 };
+        var cands = [team.theme.accent, team.theme.secondary, team.theme.primary];
+        for (var i = 0; i < cands.length; i++) {
+          var c = (cands[i] || "").toLowerCase().trim();
+          if (!c || neutral[c] || !c.startsWith("#")) continue;
+          var h = c.replace("#", "");
+          if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+          var r=parseInt(h.slice(0,2),16)/255, g=parseInt(h.slice(2,4),16)/255, b=parseInt(h.slice(4,6),16)/255;
+          r=r<0.04045?r/12.92:Math.pow((r+0.055)/1.055,2.4);
+          g=g<0.04045?g/12.92:Math.pow((g+0.055)/1.055,2.4);
+          b=b<0.04045?b/12.92:Math.pow((b+0.055)/1.055,2.4);
+          var lum = 0.2126*r+0.7152*g+0.0722*b;
+          if (lum >= 0.02 && lum <= 0.75) return cands[i];
+        }
+        return "#db0a40";
+      }
+
+      // ── Light / Dark mode ───────────────────────────────────────────────────
+      function applyThemeMode(mode) {
+        if (mode === "light") {
+          document.body.classList.add("light-mode");
+          document.getElementById("themeIcon").textContent = "🌙";
+          document.getElementById("themeLabel").textContent = " Dark Mode";
+        } else {
+          document.body.classList.remove("light-mode");
+          document.getElementById("themeIcon").textContent = "☀";
+          document.getElementById("themeLabel").textContent = " Light Mode";
+        }
+      }
+
+      var savedTheme = localStorage.getItem("themeMode") || "dark";
+      applyThemeMode(savedTheme);
+
+      document.getElementById("themeToggle").addEventListener("click", function () {
+        var next = document.body.classList.contains("light-mode") ? "dark" : "light";
+        localStorage.setItem("themeMode", next);
+        applyThemeMode(next);
+      });
+
+      boot();
+    })();
+  </script>
+</body>
+
+</html>

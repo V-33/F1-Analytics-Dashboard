@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 — Offer Comparison</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="contracts.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      color: #f4f8ff;
+      background: radial-gradient(circle at 8% -8%, #1a2741 0%, #071428 45%, #050d1d 100%);
+    }
+
+    /* ── Cursor ── */
+    .cursor {
+      width: 11px;
+      height: 11px;
+      background: #db0a40;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 100000;
+      transform: translate(-50%, -50%);
+      transition: background 0.2s;
+    }
+
+    .cursor-trail {
+      width: 26px;
+      height: 26px;
+      border: 2px solid rgba(219, 10, 64, 0.5);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: border-color 0.2s;
+    }
+
+    @media (max-width: 600px) {
+
+      .cursor,
+      .cursor-trail {
+        display: none;
+      }
+    }
+
+    /* ── Top accent bar ── */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #db0a40, #FFCC00, #db0a40);
+      z-index: 200;
+      transition: background 0.4s;
+    }
+
+    /* ── Page grid — 4 rows, fits 100vh ── */
+    .page {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 50px 72px 1fr 1fr;
+      gap: 8px;
+      padding: 14px 16px 10px;
+    }
+
+    /* ── Glassmorphism card base ── */
+    .glass {
+      background: rgba(14, 28, 50, 0.64);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(219, 10, 64, 0.32);
+      border-radius: 12px;
+      transition: border-color 0.4s;
+    }
+
+    /* ─────────────────── ROW 1: HEADER ─────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.76rem;
+      font-weight: 500;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .header-title {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .header-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-sub {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .contract-id-label {
+      font-size: 0.66rem;
+      color: rgba(255, 255, 255, 0.3);
+      letter-spacing: 0.3px;
+    }
+
+    .status-badge {
+      padding: 4px 13px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+
+    .status-badge.pending {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .status-badge.active {
+      color: #22c55e;
+      border-color: rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .status-badge.negotiating {
+      color: #60a5fa;
+      border-color: rgba(96, 165, 250, 0.4);
+      background: rgba(96, 165, 250, 0.1);
+    }
+
+    .status-badge.terminated {
+      color: #e10600;
+      border-color: rgba(225, 6, 0, 0.4);
+      background: rgba(225, 6, 0, 0.1);
+    }
+
+    .status-badge.expired {
+      color: rgba(255, 255, 255, 0.4);
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* ─────────────────── ROW 2: TILES ─────────────────── */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .tile {
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .tile-label {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.42);
+      margin-bottom: 3px;
+    }
+
+    .tile-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .tile-sub {
+      font-size: 0.62rem;
+      color: rgba(255, 255, 255, 0.32);
+      margin-top: 2px;
+    }
+
+    .gold {
+      color: #b8aa76;
+    }
+
+    /* ─────────────────── ROW 3: CHARTS ─────────────────── */
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .chart-card {
+      padding: 10px 14px 8px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .chart-title {
+      font-size: 0.64rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.42);
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+
+    .chart-wrap {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+    }
+
+    .chart-wrap canvas {
+      position: absolute;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* ─────────────────── ROW 4: BOTTOM ─────────────────── */
+    .bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    /* Compare card */
+    .compare-card {
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      font-size: 0.64rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.42);
+      margin-bottom: 7px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title-bar {
+      width: 3px;
+      height: 13px;
+      border-radius: 2px;
+      background: #db0a40;
+      flex-shrink: 0;
+      transition: background 0.4s;
+    }
+
+    .table-wrap {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+    }
+
+    thead th {
+      padding: 3px 8px 5px;
+      text-align: left;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      font-weight: 500;
+    }
+
+    tbody td {
+      padding: 5px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .td-label {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .td-current {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .td-offer {
+      color: #b8aa76;
+      font-weight: 600;
+    }
+
+    .delta-pos {
+      color: #22c55e;
+      font-size: 0.7rem;
+    }
+
+    .delta-neg {
+      color: #e10600;
+      font-size: 0.7rem;
+    }
+
+    .delta-neu {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.7rem;
+    }
+
+    .rec-row {
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .rec-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 13px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .rec-upgrade {
+      color: #22c55e;
+      border-color: rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .rec-risk {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .rec-lateral {
+      color: #60a5fa;
+      border-color: rgba(96, 165, 250, 0.4);
+      background: rgba(96, 165, 250, 0.1);
+    }
+
+    .rec-downgrade {
+      color: #e10600;
+      border-color: rgba(225, 6, 0, 0.4);
+      background: rgba(225, 6, 0, 0.1);
+    }
+
+    /* Negotiation card */
+    .neg-card {
+      padding: 10px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-height: 0;
+    }
+
+    .neg-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    .neg-slider-label {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.42);
+      flex-shrink: 0;
+      width: 108px;
+    }
+
+    .neg-slider {
+      flex: 1;
+      accent-color: #db0a40;
+      cursor: pointer;
+      transition: accent-color 0.4s;
+    }
+
+    .neg-slider-val {
+      font-size: 0.82rem;
+      font-weight: 700;
+      width: 78px;
+      text-align: right;
+      flex-shrink: 0;
+      color: #b8aa76;
+    }
+
+    .cap-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .cap-label {
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.38);
+      flex-shrink: 0;
+    }
+
+    .cap-track {
+      flex: 1;
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .cap-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: #db0a40;
+      transition: width 0.28s ease, background 0.4s;
+    }
+
+    .cap-pct {
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.45);
+      flex-shrink: 0;
+      min-width: 34px;
+      text-align: right;
+    }
+
+    .cap-pct.over {
+      color: #e10600;
+    }
+
+    .prob-row {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.42);
+      margin-bottom: 8px;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .prob-val {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .delta-live-row {
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.35);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .delta-live-val {
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .delta-live-pos {
+      color: #22c55e;
+    }
+
+    .delta-live-neg {
+      color: #e10600;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 8px 4px;
+      border-radius: 9px;
+      font-size: 0.73rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      border: 1px solid;
+      transition: transform 0.15s, opacity 0.2s, background 0.2s;
+      text-align: center;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-accept {
+      background: rgba(34, 197, 94, 0.12);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #22c55e;
+    }
+
+    .btn-accept:hover {
+      background: rgba(34, 197, 94, 0.22);
+    }
+
+    .btn-reject {
+      background: rgba(225, 6, 0, 0.1);
+      border-color: rgba(225, 6, 0, 0.35);
+      color: #e10600;
+    }
+
+    .btn-reject:hover {
+      background: rgba(225, 6, 0, 0.22);
+    }
+
+    .btn-negotiate {
+      background: rgba(96, 165, 250, 0.1);
+      border-color: rgba(96, 165, 250, 0.35);
+      color: #60a5fa;
+    }
+
+    .btn-negotiate:hover {
+      background: rgba(96, 165, 250, 0.2);
+    }
+
+    /* ── No-offer state ── */
+    .no-offer-page {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: radial-gradient(circle at 8% -8%, #1a2741 0%, #071428 45%, #050d1d 100%);
+    }
+
+    .no-offer-page.show {
+      display: flex;
+    }
+
+    .no-offer-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .no-offer-sub {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .no-offer-back {
+      margin-top: 6px;
+      color: rgba(255, 255, 255, 0.38);
+      font-size: 0.8rem;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* ── Loading ── */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #050d1d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .loading-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .loading-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #db0a40;
+      animation: ldpulse 1.2s ease-in-out infinite;
+    }
+
+    .loading-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes ldpulse {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.7);
+        opacity: 0.4
+      }
+
+      40% {
+        transform: scale(1.2);
+        opacity: 1
+      }
+    }
+
+    .loading-text {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.28);
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: rgba(14, 28, 50, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 11px 18px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      z-index: 9998;
+      transform: translateY(10px);
+      opacity: 0;
+      transition: transform 0.24s, opacity 0.24s;
+      max-width: 260px;
+      backdrop-filter: blur(12px);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.ok {
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #22c55e;
+    }
+
+    .toast.fail {
+      border-color: rgba(225, 6, 0, 0.4);
+      color: #e10600;
+    }
+
+    .toast.info {
+      border-color: rgba(96, 165, 250, 0.4);
+      color: #60a5fa;
+    }
+
+    /* ── Theme toggle (compact icon) ── */
+    .btn-theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.65);
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-theme-toggle:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+    /* ── Info tooltip ── */
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.13);
+      color: rgba(255,255,255,0.55);
+      font-size: 0.55rem;
+      font-weight: 700;
+      font-style: normal;
+      cursor: help;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+      vertical-align: middle;
+      line-height: 1;
+      transition: background 0.2s;
+    }
+    .info-icon:hover { background: rgba(255,255,255,0.28); }
+    .info-icon::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1c1c1c;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 0.65rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.9);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.18s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      font-family: "Poppins", sans-serif;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .info-icon:hover::after { opacity: 1; }
+
+    /* ══════════════════════════
+       LIGHT MODE
+    ══════════════════════════ */
+    body.light-mode {
+      background: #f0f2f5;
+      color: #111;
+    }
+    body.light-mode .glass {
+      background: rgba(255,255,255,0.92) !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    body.light-mode .tile-label { color: rgba(0,0,0,0.5); }
+    body.light-mode .tile-value { color: #111; }
+    body.light-mode .tile-sub { color: rgba(0,0,0,0.42); }
+    body.light-mode .gold { color: #7a6a2a; }
+    body.light-mode .chart-title { color: rgba(0,0,0,0.5); }
+    body.light-mode .panel-title { color: rgba(0,0,0,0.5); }
+    body.light-mode .header-name { color: #111; }
+    body.light-mode .header-sub { color: rgba(0,0,0,0.45); }
+    body.light-mode .contract-id-label { color: rgba(0,0,0,0.38); }
+    body.light-mode .back-btn { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.6); }
+    body.light-mode .back-btn:hover { background: rgba(0,0,0,0.1); color: #111; }
+    body.light-mode .btn-theme-toggle { background: rgba(0,0,0,0.07); border-color: rgba(0,0,0,0.14); color: rgba(0,0,0,0.65); }
+    body.light-mode .btn-theme-toggle:hover { background: rgba(0,0,0,0.12); color: #111; }
+    body.light-mode thead th { color: rgba(0,0,0,0.42); border-bottom-color: rgba(0,0,0,0.08); }
+    body.light-mode tbody td { border-bottom-color: rgba(0,0,0,0.05); }
+    body.light-mode .td-label { color: rgba(0,0,0,0.5); }
+    body.light-mode .td-current { color: rgba(0,0,0,0.65); }
+    body.light-mode .td-offer { color: #7a6a2a; }
+    body.light-mode .neg-slider-label { color: rgba(0,0,0,0.5); }
+    body.light-mode .cap-label { color: rgba(0,0,0,0.42); }
+    body.light-mode .cap-track { background: rgba(0,0,0,0.1); }
+    body.light-mode .cap-pct { color: rgba(0,0,0,0.5); }
+    body.light-mode .prob-row { color: rgba(0,0,0,0.5); }
+    body.light-mode .prob-val { color: #111; }
+    body.light-mode .delta-live-row { color: rgba(0,0,0,0.42); }
+    body.light-mode .neg-slider-val { color: #7a6a2a; }
+    body.light-mode .no-offer-page { background: #f0f2f5; }
+    body.light-mode .no-offer-title { color: rgba(0,0,0,0.65); }
+    body.light-mode .no-offer-sub { color: rgba(0,0,0,0.42); }
+    body.light-mode .no-offer-back { color: rgba(0,0,0,0.45); }
+    body.light-mode .loading-screen { background: #f0f2f5; }
+    body.light-mode .loading-text { color: rgba(0,0,0,0.35); }
+    body.light-mode .toast { background: rgba(255,255,255,0.96); border-color: rgba(0,0,0,0.12); }
+    body.light-mode .info-icon { background: rgba(0,0,0,0.1); color: rgba(0,0,0,0.5); }
+    body.light-mode .info-icon::after { background: #fff; border-color: rgba(0,0,0,0.15); color: #111; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  </style>
+</head>
+
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-dots">
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+    </div>
+    <div class="loading-text" id="loadingText">Loading offer data…</div>
+  </div>
+
+  <div class="no-offer-page" id="noOfferPage">
+    <div class="no-offer-title">Offer Not Found</div>
+    <div class="no-offer-sub" id="noOfferSub">Could not locate the requested contract offer.</div>
+    <a href="new_contract.html" class="no-offer-back">← Back to Offers</a>
+  </div>
+
+  <div class="top-bar" id="topBar"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-trail" id="cursorTrail"></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="page" id="page" style="visibility:hidden">
+
+    <!-- ROW 1: Header -->
+    <header class="header glass">
+      <a href="new_contract.html" class="back-btn">← Offers</a>
+      <div class="header-title">
+        <div class="header-name" id="headerName">—</div>
+        <div class="header-sub" id="headerSub">—</div>
+      </div>
+      <div class="header-right">
+        <button class="btn-theme-toggle" id="themeToggle" title="Toggle light/dark mode">☀</button>
+        <span class="contract-id-label" id="contractIdLabel">—</span>
+        <span class="status-badge pending" id="statusBadge">PENDING</span>
+      </div>
+    </header>
+
+    <!-- ROW 2: Tiles -->
+    <div class="tiles">
+      <div class="tile glass">
+        <div class="tile-label">Base Salary <span class="info-icon" data-tip="Proposed annual base salary for this contract">i</span></div>
+        <div class="tile-value gold" id="tileSalary">—</div>
+        <div class="tile-sub" id="tileSalarySub">—</div>
+      </div>
+      <div class="tile glass">
+        <div class="tile-label">Championship Bonus <span class="info-icon" data-tip="Bonus paid out on a constructors' title win">i</span></div>
+        <div class="tile-value" id="tileBonus">—</div>
+        <div class="tile-sub">on title win</div>
+      </div>
+      <div class="tile glass">
+        <div class="tile-label">Signing Bonus <span class="info-icon" data-tip="One-time bonus paid at the start of the contract">i</span></div>
+        <div class="tile-value gold" id="tileSigning">—</div>
+        <div class="tile-sub">on contract start</div>
+      </div>
+      <div class="tile glass">
+        <div class="tile-label">Dev Index <span class="info-icon" data-tip="Proposed team's car development capability score (0–10)">i</span></div>
+        <div class="tile-value" id="tileDev">—</div>
+        <div class="tile-sub" id="tileDevSub">/ 10</div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Charts -->
+    <div class="charts">
+      <div class="chart-card glass">
+        <div class="chart-title">Salary Comparison</div>
+        <div class="chart-wrap"><canvas id="chartBar"></canvas></div>
+      </div>
+      <div class="chart-card glass">
+        <div class="chart-title">Package Breakdown</div>
+        <div class="chart-wrap"><canvas id="chartPie"></canvas></div>
+      </div>
+      <div class="chart-card glass">
+        <div class="chart-title">Team Analysis</div>
+        <div class="chart-wrap"><canvas id="chartRadar"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ROW 4: Bottom -->
+    <div class="bottom">
+
+      <!-- Compare table -->
+      <div class="compare-card glass">
+        <div class="panel-title">
+          <span class="panel-title-bar" id="panelBarLeft"></span>
+          Contract Comparison
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Current <span class="info-icon" data-tip="Your current contract value">i</span></th>
+                <th>Proposed <span class="info-icon" data-tip="Value offered in this contract">i</span></th>
+                <th>Delta <span class="info-icon" data-tip="Green = better offer · Red = worse offer">i</span></th>
+              </tr>
+            </thead>
+            <tbody id="compareBody"></tbody>
+          </table>
+        </div>
+        <div class="rec-row">
+          <span class="rec-badge rec-lateral" id="recBadge">→ Evaluating…</span>
+        </div>
+      </div>
+
+      <!-- Negotiation panel -->
+      <div class="neg-card glass">
+        <div class="panel-title">
+          <span class="panel-title-bar" id="panelBarRight"></span>
+          Counter-Offer Simulator
+        </div>
+
+        <div class="neg-slider-row">
+          <span class="neg-slider-label">Counter Salary</span>
+          <input type="range" class="neg-slider" id="sliderSal" min="1000000" max="80000000" step="500000"
+            value="20000000">
+          <span class="neg-slider-val" id="sliderDisplay">$20M</span>
+        </div>
+
+        <div class="cap-bar-row">
+          <span class="cap-label">Cap usage</span>
+          <div class="cap-track">
+            <div class="cap-fill" id="capFill" style="width:0%"></div>
+          </div>
+          <span class="cap-pct" id="capPct">0%</span>
+        </div>
+
+        <div class="delta-live-row">
+          vs proposed:&nbsp;<span class="delta-live-val delta-live-pos" id="deltaLive">—</span>
+        </div>
+
+        <div class="prob-row">
+          Acceptance probability:&nbsp;<span class="prob-val" id="probDisplay">—%</span>
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-accept" id="btnAccept">Accept</button>
+          <button class="btn btn-reject" id="btnReject">Reject</button>
+          <button class="btn btn-negotiate" id="btnNegotiate">Negotiate</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // ── Light / Dark mode ─────────────────────────────────────────────────────
+      var buildCharts = null;
+
+      function chartColors() {
+        var light = document.body.classList.contains("light-mode");
+        return {
+          tick:       light ? "rgba(0,0,0,0.5)"    : "rgba(255,255,255,0.42)",
+          grid:       light ? "rgba(0,0,0,0.08)"   : "rgba(255,255,255,0.06)",
+          legend:     light ? "rgba(0,0,0,0.5)"    : "rgba(255,255,255,0.5)",
+          pointLabel: light ? "rgba(0,0,0,0.5)"    : "rgba(255,255,255,0.48)"
+        };
+      }
+
+      function applyThemeMode(mode) {
+        if (mode === "light") {
+          document.body.classList.add("light-mode");
+          document.getElementById("themeToggle").textContent = "🌙";
+        } else {
+          document.body.classList.remove("light-mode");
+          document.getElementById("themeToggle").textContent = "☀";
+        }
+        if (buildCharts) buildCharts();
+      }
+
+      var savedTheme = localStorage.getItem("themeMode") || "dark";
+      applyThemeMode(savedTheme);
+
+      document.getElementById("themeToggle").addEventListener("click", function () {
+        var next = document.body.classList.contains("light-mode") ? "dark" : "light";
+        localStorage.setItem("themeMode", next);
+        applyThemeMode(next);
+      });
+
+      // ── Auth + params ──────────────────────────────────────────────────────────
+      var params = new URLSearchParams(location.search);
+      var contractId = params.get("contractId");
+      var driverId = localStorage.getItem("loggedInDriver");
+      if (!driverId) { location.replace("index.html"); return; }
+      if (!contractId) {
+        document.getElementById("loadingScreen").style.display = "none";
+        document.getElementById("noOfferSub").textContent = "No contractId specified in URL.";
+        document.getElementById("noOfferPage").classList.add("show");
+        return;
+      }
+
+      // ── Cursor ────────────────────────────────────────────────────────────────
+      var cur = document.getElementById("cursor");
+      var trail = document.getElementById("cursorTrail");
+      var mx = 0, my = 0, tx = 0, ty = 0;
+      document.addEventListener("mousemove", function (e) { mx = e.clientX; my = e.clientY; });
+      (function loop() {
+        cur.style.left = mx + "px"; cur.style.top = my + "px";
+        tx += (mx - tx) * 0.12; ty += (my - ty) * 0.12;
+        trail.style.left = tx + "px"; trail.style.top = ty + "px";
+        requestAnimationFrame(loop);
+      })();
+
+      // ── Toast ─────────────────────────────────────────────────────────────────
+      var toastEl = document.getElementById("toast");
+      var toastTimer;
+      function showToast(msg, type) {
+        clearTimeout(toastTimer);
+        toastEl.textContent = msg;
+        toastEl.className = "toast show " + (type || "info");
+        toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 3200);
+      }
+
+      // ── Helpers ───────────────────────────────────────────────────────────────
+      function fmt(n) {
+        if (n == null || isNaN(n)) return "N/A";
+        var abs = Math.abs(n);
+        if (abs >= 1e9) return "$" + (n / 1e9).toFixed(1) + "B";
+        if (abs >= 1e6) return "$" + (n / 1e6).toFixed(1) + "M";
+        if (abs >= 1e3) return "$" + (n / 1e3).toFixed(0) + "K";
+        return "$" + n;
+      }
+
+      function hexAlpha(hex, a) {
+        var h = hex.replace("#", "");
+        if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+        var r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+        return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+      }
+
+      function getLuminance(hex) {
+        var h = hex.replace("#", "");
+        if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+        var r=parseInt(h.slice(0,2),16)/255, g=parseInt(h.slice(2,4),16)/255, b=parseInt(h.slice(4,6),16)/255;
+        r=r<0.04045?r/12.92:Math.pow((r+0.055)/1.055,2.4);
+        g=g<0.04045?g/12.92:Math.pow((g+0.055)/1.055,2.4);
+        b=b<0.04045?b/12.92:Math.pow((b+0.055)/1.055,2.4);
+        return 0.2126*r+0.7152*g+0.0722*b;
+      }
+
+      // Pick the most visually distinct (non-black, non-white) team color
+      function pickAccent(theme) {
+        var neutral = { "#ffffff": 1, "#000000": 1, "#0a0a0a": 1, "#000": 1, "#fff": 1 };
+        var candidates = [theme.accent, theme.secondary, theme.primary];
+        for (var i = 0; i < candidates.length; i++) {
+          var c = (candidates[i] || "").toLowerCase();
+          if (c && !neutral[c]) return candidates[i];
+        }
+        return "#db0a40";
+      }
+
+      // ── Recommendation ────────────────────────────────────────────────────────
+      function recommend(curSal, offSal, curDev, offDev) {
+        var sd = offSal - curSal;
+        var dd = offDev - curDev;
+        if (sd > 0 && dd >= 0) return { label: "Financial & Performance Upgrade", cls: "rec-upgrade", icon: "↑" };
+        if (sd > 0 && dd < -0.5) return { label: "Financial Upgrade — Performance Risk", cls: "rec-risk", icon: "⚠" };
+        if (sd < 0 && dd > 0.5) return { label: "Performance Move — Pay Cut", cls: "rec-risk", icon: "⚠" };
+        if (sd < 0 && dd < 0) return { label: "Financial Downgrade", cls: "rec-downgrade", icon: "↓" };
+        return { label: "Lateral Move", cls: "rec-lateral", icon: "→" };
+      }
+
+      // ── Acceptance probability ────────────────────────────────────────────────
+      function acceptProb(salary, cap) {
+        if (!cap) return 50;
+        if (salary <= cap) return Math.min(96, Math.max(70, Math.round(96 - (salary / cap) * 24)));
+        var over = (salary - cap) / cap;
+        return Math.min(69, Math.max(5, Math.round(70 - over * 130)));
+      }
+
+      // ── Normalise to 0-10 ─────────────────────────────────────────────────────
+      function norm(val, max) { return max ? Math.min(10, (val / max) * 10) : 0; }
+
+      // ── Resolve current team ──────────────────────────────────────────────────
+      function resolveTeam(driver, allTeams) {
+        var tid = driver.contract && driver.contract.teamId;
+        if (tid) { var t = allTeams.find(function (x) { return x.teamId === tid; }); if (t) return t; }
+        var ct = ((driver.personalDetails && driver.personalDetails.currentTeam) || "").toLowerCase();
+        return allTeams.find(function (x) {
+          var sn = x.shortName.toLowerCase();
+          var tn = x.teamName.toLowerCase();
+          return sn === ct || tn === ct || tn.includes(ct) || ct.includes(sn);
+        }) || null;
+      }
+
+      // ── Theme ─────────────────────────────────────────────────────────────────
+      var accentColor = "#db0a40";
+      var salaryCap = 40000000;
+
+      function applyTheme(team) {
+        if (!team || !team.theme) return;
+        accentColor = pickAccent(team.theme);
+        var ac = accentColor;
+        var ac2 = (team.theme.secondary && team.theme.secondary !== ac) ? team.theme.secondary : ac;
+        var isHex = ac.startsWith("#");
+        var acA = isHex ? hexAlpha(ac, 0.5) : ac;
+        var acB = isHex ? hexAlpha(ac, 0.32) : ac;
+        var acC = isHex ? hexAlpha(ac, 0.14) : ac;
+
+        document.getElementById("topBar").style.background =
+          "linear-gradient(90deg," + ac + "," + ac2 + "," + ac + ")";
+        document.getElementById("cursor").style.background = ac;
+        document.getElementById("cursorTrail").style.borderColor = acA;
+
+        // Safe text accent: skip near-white colors
+        var textAc = (function () {
+          if (!ac.startsWith("#") || getLuminance(ac) <= 0.7) return ac;
+          var th = team.theme;
+          var sec = th.secondary;
+          if (sec && sec.startsWith("#") && getLuminance(sec) <= 0.7) return sec;
+          var pri = th.primary;
+          if (pri && pri.startsWith("#") && getLuminance(pri) >= 0.05 && getLuminance(pri) <= 0.7) return pri;
+          return "#db0a40";
+        })();
+
+        var s = document.getElementById("themeStyle");
+        if (!s) { s = document.createElement("style"); s.id = "themeStyle"; document.head.appendChild(s); }
+        s.textContent =
+          ".glass { border-color:" + acB + " !important }" +
+          ".panel-title-bar { background:" + ac + " !important }" +
+          ".cap-fill { background:" + ac + " !important }" +
+          ".neg-slider { accent-color:" + ac + " !important }" +
+          ".header-name { color:" + textAc + " !important }" +
+          ".tile-value { color:" + textAc + " !important }" +
+          ".neg-slider-val { color:" + textAc + " !important }" +
+          ".prob-val { color:" + textAc + " !important }" +
+          ".td-offer { color:" + textAc + " !important }";
+
+        salaryCap = (team.financial && team.financial.salaryCapAllocation) || 40000000;
+      }
+
+      // ── Chart instances ───────────────────────────────────────────────────────
+      var charts = {};
+      function destroyCharts() {
+        ["bar", "pie", "radar"].forEach(function (k) {
+          if (charts[k]) { charts[k].destroy(); charts[k] = null; }
+        });
+      }
+
+      // ── Update negotiation panel ──────────────────────────────────────────────
+      var offerSalary = 0;
+      function updateNeg(salary) {
+        document.getElementById("sliderDisplay").textContent = fmt(salary);
+
+        var prob = acceptProb(salary, salaryCap);
+        document.getElementById("probDisplay").textContent = prob + "%";
+
+        var pct = Math.min(salary / salaryCap * 100, 100);
+        var fill = document.getElementById("capFill");
+        fill.style.width = pct.toFixed(1) + "%";
+        var over = salary > salaryCap;
+        fill.style.background = over ? "#e10600" : accentColor;
+        var capPctEl = document.getElementById("capPct");
+        capPctEl.textContent = pct.toFixed(0) + "%";
+        capPctEl.className = "cap-pct" + (over ? " over" : "");
+
+        var delta = salary - offerSalary;
+        var dlEl = document.getElementById("deltaLive");
+        dlEl.textContent = (delta >= 0 ? "+" : "") + fmt(delta);
+        dlEl.className = "delta-live-val " + (delta >= 0 ? "delta-live-pos" : "delta-live-neg");
+      }
+
+      // ── Main render ───────────────────────────────────────────────────────────
+      function render(offer, driver, currentTeam, proposedTeam, allTeams) {
+
+        applyTheme(proposedTeam);
+
+        var ac = accentColor;
+        var isHex = ac.startsWith("#");
+        var acAlpha = isHex ? hexAlpha(ac, 0.15) : ac;
+
+        var currentSalary = (driver.financials && driver.financials.annualSalary) ||
+          (driver.contract && driver.contract.baseSalary) || 0;
+        var currentChamp = (driver.financials && driver.financials.performanceBonus &&
+          driver.financials.performanceBonus.championshipBonus) || 0;
+        var currentDevIndex = currentTeam ? (currentTeam.performance.developmentIndex || 7) : 7;
+        var currentRel = currentTeam ? (currentTeam.performance.reliabilityScore || 8) : 8;
+        var currentAero = currentTeam ? (currentTeam.performance.aeroEfficiency || 7.5) : 7.5;
+        var currentChamps = currentTeam ? (currentTeam.performance.constructorChampionships || 0) : 0;
+        var currentBudget = currentTeam ? ((currentTeam.financial && currentTeam.financial.annualBudget) || 400000000) : 400000000;
+        var currentLen = 0;
+        if (driver.contract && driver.contract.startDate && driver.contract.endDate) {
+          currentLen = parseInt(driver.contract.endDate) - parseInt(driver.contract.startDate);
+        }
+
+        var propDevIndex = offer.devIndex != null ? offer.devIndex : (proposedTeam ? proposedTeam.performance.developmentIndex : 7);
+        var propRel = offer.reliability != null ? offer.reliability : (proposedTeam ? proposedTeam.performance.reliabilityScore : 8);
+        var propAero = proposedTeam ? (proposedTeam.performance.aeroEfficiency || 7.5) : 7.5;
+        var propChamps = proposedTeam ? (proposedTeam.performance.constructorChampionships || 0) : 0;
+        var propBudget = proposedTeam ? ((proposedTeam.financial && proposedTeam.financial.annualBudget) || 400000000) : 400000000;
+
+        // Normalisation maximums
+        var maxChamps = Math.max.apply(null, allTeams.map(function (t) { return t.performance.constructorChampionships || 0; }).concat(1));
+        var maxBudget = Math.max.apply(null, allTeams.map(function (t) { return (t.financial && t.financial.annualBudget) || 0; }).concat(1));
+
+        offerSalary = offer.baseSalary || 0;
+
+        // ── Header ──
+        var driverName = driver.personalDetails.fullName || driverId;
+        var curTeamName = currentTeam ? currentTeam.teamName : (driver.contract && driver.contract.team) || "Current Team";
+        var propTeamName = proposedTeam ? proposedTeam.teamName : offer.teamName || offer.teamId;
+
+        document.getElementById("headerName").textContent = driverName + " — " + propTeamName;
+        document.getElementById("headerSub").textContent = "Current: " + curTeamName + "  →  Proposed: " + propTeamName;
+        document.getElementById("contractIdLabel").textContent = offer.contractId;
+        document.title = driverName + " — Offer Comparison";
+
+        var sb = document.getElementById("statusBadge");
+        sb.textContent = offer.status.toUpperCase();
+        sb.className = "status-badge " + offer.status;
+
+        // ── Tiles ──
+        document.getElementById("tileSalary").textContent = fmt(offer.baseSalary);
+        document.getElementById("tileSalarySub").textContent = "vs current " + fmt(currentSalary);
+        document.getElementById("tileBonus").textContent = fmt(offer.bonus || 0);
+        document.getElementById("tileSigning").textContent = fmt(offer.signingBonus || 0);
+        document.getElementById("tileDev").textContent = propDevIndex.toFixed(1);
+        document.getElementById("tileDevSub").textContent = "/ 10  (now " + currentDevIndex.toFixed(1) + ")";
+
+        // ── Compare table ──
+        var rows = [
+          ["Base Salary", fmt(currentSalary), fmt(offer.baseSalary), offer.baseSalary - currentSalary, true],
+          ["Champ Bonus", fmt(currentChamp), fmt(offer.bonus || 0), (offer.bonus || 0) - currentChamp, true],
+          ["Signing Bonus", "—", fmt(offer.signingBonus || 0), offer.signingBonus || 0, true],
+          ["Dev Index", currentDevIndex.toFixed(1), propDevIndex.toFixed(1), propDevIndex - currentDevIndex, false],
+          ["Reliability", currentRel.toFixed(1), propRel.toFixed(1), propRel - currentRel, false],
+          ["Aero Efficiency", currentAero.toFixed(1), propAero.toFixed(1), propAero - currentAero, false],
+          ["Contract Length", currentLen ? currentLen + "y" : "—",
+            (offer.contractLength || "?") + "y",
+            currentLen ? (offer.contractLength || 0) - currentLen : null, false],
+        ];
+
+        document.getElementById("compareBody").innerHTML = rows.map(function (r) {
+          var delta = r[3];
+          var isMoney = r[4];
+          var dStr = "—", dCls = "delta-neu";
+          if (delta !== null && delta !== undefined && !isNaN(delta)) {
+            var pos = delta > 0;
+            var neg = delta < 0;
+            // higher = better for driver on all rows (salary/bonuses/dev/reliability/aero/length)
+            dCls = pos ? "delta-pos" : (neg ? "delta-neg" : "delta-neu");
+            if (delta === 0) {
+              dStr = "=";
+            } else {
+              var sign = pos ? "+" : "-";
+              dStr = sign + (isMoney ? fmt(Math.abs(delta)) : Math.abs(delta).toFixed(1));
+            }
+          }
+          return "<tr>" +
+            "<td class='td-label'>" + r[0] + "</td>" +
+            "<td class='td-current'>" + r[1] + "</td>" +
+            "<td class='td-offer'>" + r[2] + "</td>" +
+            "<td><span class='" + dCls + "'>" + dStr + "</span></td>" +
+            "</tr>";
+        }).join("");
+
+        // ── Recommendation ──
+        var rec = recommend(currentSalary, offer.baseSalary, currentDevIndex, propDevIndex);
+        var rb = document.getElementById("recBadge");
+        rb.textContent = rec.icon + " " + rec.label;
+        rb.className = "rec-badge " + rec.cls;
+
+        // ── Panel bars ──
+        document.getElementById("panelBarLeft").style.background = ac;
+        document.getElementById("panelBarRight").style.background = ac;
+
+        // ── Negotiation panel ──
+        var slider = document.getElementById("sliderSal");
+        slider.min = Math.round(salaryCap * 0.2);
+        slider.max = Math.round(salaryCap * 1.7);
+        slider.step = 500000;
+        slider.value = offer.baseSalary;
+        updateNeg(offer.baseSalary);
+        slider.oninput = function () { updateNeg(parseInt(this.value)); };
+
+        // ── Action buttons ──
+        function wireBtn(id, status) {
+          var btn = document.getElementById(id);
+          btn.disabled = (offer.status === status);
+          btn.onclick = function () {
+            try {
+              updateContractStatus(offer.contractId, status);
+              offer.status = status;
+              sb.textContent = status.toUpperCase();
+              sb.className = "status-badge " + status;
+              showToast(offer.contractId + ": " + status, "ok");
+              ["btnAccept", "btnReject", "btnNegotiate"].forEach(function (bid) {
+                document.getElementById(bid).disabled = true;
+              });
+              if (status === "negotiating") {
+                document.getElementById("btnAccept").disabled = false;
+                document.getElementById("btnReject").disabled = false;
+              }
+            } catch (e) { showToast("Error: " + e.message, "fail"); }
+          };
+        }
+        wireBtn("btnAccept", "active");
+        wireBtn("btnReject", "terminated");
+        wireBtn("btnNegotiate", "negotiating");
+
+        // ── Charts ────────────────────────────────────────────────────────────
+        var acFull = isHex ? hexAlpha(ac, 0.8) : ac;
+        var curRadar = [
+          currentDevIndex, currentRel, currentAero,
+          norm(currentChamps, maxChamps), norm(currentBudget, maxBudget)
+        ];
+        var propRadar = [
+          propDevIndex, propRel, propAero,
+          norm(propChamps, maxChamps), norm(propBudget, maxBudget)
+        ];
+
+        buildCharts = function () {
+          destroyCharts();
+          var cc = chartColors();
+          var tickStyle = { color: cc.tick, font: { family: "Poppins", size: 9 } };
+          var gridStyle = { color: cc.grid };
+
+          // Bar — Salary comparison
+          var barBg = document.body.classList.contains("light-mode")
+            ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.14)";
+          charts.bar = new Chart(document.getElementById("chartBar"), {
+            type: "bar",
+            data: {
+              labels: ["Current", "Proposed"],
+              datasets: [{
+                data: [currentSalary, offer.baseSalary],
+                backgroundColor: [barBg, acFull],
+                borderRadius: 6,
+                borderSkipped: false
+              }]
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: tickStyle, grid: gridStyle },
+                y: { ticks: Object.assign({}, tickStyle, { callback: function (v) { return "$" + (v / 1e6).toFixed(0) + "M"; } }), grid: gridStyle }
+              }
+            }
+          });
+
+          // Pie — Package breakdown
+          charts.pie = new Chart(document.getElementById("chartPie"), {
+            type: "doughnut",
+            data: {
+              labels: ["Base Salary", "Signing Bonus", "Champ Bonus"],
+              datasets: [{
+                data: [offer.baseSalary, offer.signingBonus || 0, offer.bonus || 0],
+                backgroundColor: [acFull, "#b8aa76", "#60a5fa"],
+                borderWidth: 0,
+                hoverOffset: 5
+              }]
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: "bottom",
+                  labels: { color: cc.legend, font: { family: "Poppins", size: 9 }, padding: 9, boxWidth: 10 }
+                }
+              },
+              cutout: "60%"
+            }
+          });
+
+          // Radar — Team comparison
+          var curBorder = document.body.classList.contains("light-mode")
+            ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.38)";
+          var curBg = document.body.classList.contains("light-mode")
+            ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.05)";
+          var curPoint = document.body.classList.contains("light-mode")
+            ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.55)";
+          charts.radar = new Chart(document.getElementById("chartRadar"), {
+            type: "radar",
+            data: {
+              labels: ["Dev Index", "Reliability", "Aero", "Championships", "Budget"],
+              datasets: [
+                {
+                  label: "Current",
+                  data: curRadar,
+                  borderColor: curBorder,
+                  backgroundColor: curBg,
+                  pointBackgroundColor: curPoint,
+                  pointRadius: 3,
+                  borderWidth: 1.5
+                },
+                {
+                  label: "Proposed",
+                  data: propRadar,
+                  borderColor: ac,
+                  backgroundColor: acAlpha,
+                  pointBackgroundColor: ac,
+                  pointRadius: 3,
+                  borderWidth: 1.5
+                }
+              ]
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: "bottom",
+                  labels: { color: cc.legend, font: { family: "Poppins", size: 9 }, padding: 9, boxWidth: 10 }
+                }
+              },
+              scales: {
+                r: {
+                  min: 0, max: 10,
+                  ticks: { display: false },
+                  grid: { color: cc.grid },
+                  angleLines: { color: cc.grid },
+                  pointLabels: { color: cc.pointLabel, font: { family: "Poppins", size: 9 } }
+                }
+              }
+            }
+          });
+        };
+        buildCharts();
+      }
+
+      // ── Boot ──────────────────────────────────────────────────────────────────
+      async function boot() {
+        try {
+          var results = await Promise.all([
+            fetch("backend/f1_2025_drivers_Dataset.json").then(function (r) { return r.json(); }),
+            fetch("backend/f1_teams_dataset.json").then(function (r) { return r.json(); })
+          ]);
+
+          var allDrivers = Array.isArray(results[0]) ? results[0] : (results[0].drivers || []);
+          var allTeams = Array.isArray(results[1]) ? results[1] : (results[1].teams || []);
+
+          seedContracts();
+
+          var driver = allDrivers.find(function (d) { return d.driverId === driverId; });
+          if (!driver) {
+            document.getElementById("loadingText").textContent = "Driver not found.";
+            return;
+          }
+
+          // Find the requested offer
+          var offer = getAllContracts().find(function (c) { return c.contractId === contractId; });
+          if (!offer) {
+            document.getElementById("loadingScreen").style.display = "none";
+            document.getElementById("noOfferSub").textContent = "Contract \"" + contractId + "\" was not found.";
+            document.getElementById("noOfferPage").classList.add("show");
+            return;
+          }
+
+          // Verify this offer belongs to the logged-in driver
+          if (offer.driverId !== driverId) {
+            document.getElementById("loadingScreen").style.display = "none";
+            document.getElementById("noOfferSub").textContent = "This offer does not belong to your account.";
+            document.getElementById("noOfferPage").classList.add("show");
+            return;
+          }
+
+          var currentTeam = resolveTeam(driver, allTeams);
+          var proposedTeam = allTeams.find(function (t) { return t.teamId === offer.teamId; }) || null;
+
+          render(offer, driver, currentTeam, proposedTeam, allTeams);
+
+          document.getElementById("loadingScreen").style.display = "none";
+          document.getElementById("page").style.visibility = "visible";
+
+        } catch (err) {
+          console.error(err);
+          document.getElementById("loadingText").textContent = "Error: " + err.message;
+        }
+      }
+
+      boot();
+    })();
+  </script>
+</body>
+
+</html>

@@ -54,7 +54,7 @@
       overflow-x: hidden;
     }
 
-    /* ── Cursor ── */
+    
     .cursor {
       width: 12px;
       height: 12px;
@@ -87,7 +87,7 @@
       }
     }
 
-    /* ── Top bar ── */
+    
     .top-bar {
       position: fixed;
       top: 0;
@@ -99,13 +99,13 @@
       transition: background 0.4s;
     }
 
-    /* ── Layout ── */
+    
     .layout {
       display: flex;
       min-height: 100vh;
     }
 
-    /* ── Sidebar ── */
+    
     .sidebar {
       width: 220px;
       min-height: 100vh;
@@ -205,14 +205,14 @@
       color: #fff;
     }
 
-    /* ── Main ── */
+    
     .main {
       margin-left: 220px;
       flex: 1;
       padding: 36px 40px 60px;
     }
 
-    /* ── Section ── */
+    
     .section {
       display: none;
       animation: fadeInUp 0.5s ease-out;
@@ -234,7 +234,7 @@
       }
     }
 
-    /* ── Section header ── */
+    
     .section-header {
       display: flex;
       align-items: center;
@@ -264,7 +264,7 @@
       background: rgba(255, 255, 255, 0.1);
     }
 
-    /* ── Sub-header ── */
+    
     .sub-header {
       display: flex;
       align-items: center;
@@ -296,7 +296,7 @@
       background: rgba(255, 255, 255, 0.07);
     }
 
-    /* ── Grids ── */
+    
     .grid-5 {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -353,7 +353,7 @@
       }
     }
 
-    /* ── Team Hero ── */
+    
     .team-hero {
       background: #0a0a0a;
       border-radius: 22px;
@@ -429,7 +429,7 @@
       pointer-events: none;
     }
 
-    /* ── Stat Cards ── */
+    
     .card {
       background: #0a0a0a;
       border-radius: 18px;
@@ -493,7 +493,7 @@
       color: #22c55e;
     }
 
-    /* ── Driver Cards (Current Drivers section) ── */
+    
     .driver-card {
       background: #0a0a0a;
       border-radius: 20px;
@@ -632,7 +632,7 @@
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    /* ── Offer section layout ── */
+    
     .drivers-panel {
       background: #0a0a0a;
       border-radius: 18px;
@@ -762,7 +762,7 @@
       flex-shrink: 0;
     }
 
-    /* ── Offer Form ── */
+    
     .form-panel {
       background: #0a0a0a;
       border-radius: 20px;
@@ -927,7 +927,7 @@
       transform: none;
     }
 
-    /* ── Toast ── */
+    
     .toast {
       position: fixed;
       bottom: 32px;
@@ -965,7 +965,7 @@
       color: #60a5fa;
     }
 
-    /* ── Loading ── */
+    
     .loading-screen {
       position: fixed;
       inset: 0;
@@ -1019,7 +1019,7 @@
       color: rgba(255, 255, 255, 0.35);
     }
 
-    /* ── Error screen ── */
+    
     .error-screen {
       position: fixed;
       inset: 0;
@@ -1056,7 +1056,7 @@
       text-decoration: underline;
     }
 
-    /* ── Spacing ── */
+    
     .mt-8 {
       margin-top: 8px;
     }
@@ -1069,7 +1069,7 @@
       margin-bottom: 0;
     }
 
-    /* ── Theme toggle button ── */
+    
     .btn-theme-toggle {
       display: flex;
       align-items: center;
@@ -1090,7 +1090,7 @@
     }
     .btn-theme-toggle:hover { background: rgba(255,255,255,0.12); color: #fff; }
 
-    /* ── Info tooltip ── */
+    
     .info-icon {
       display: inline-flex;
       align-items: center;
@@ -1136,7 +1136,7 @@
     }
     .info-icon:hover::after { opacity: 1; }
 
-    /* ── Sent offers panel ── */
+    
     .sent-offers-panel {
       background: #0a0a0a;
       border-radius: 18px;
@@ -1198,7 +1198,7 @@
     .so-status.expired     { color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
     .no-offers-msg { padding: 28px; text-align: center; color: rgba(255,255,255,0.28); font-size: 0.83rem; }
 
-    /* ── Incoming drivers badge ── */
+    
     .incoming-badge {
       display: inline-flex;
       align-items: center;
@@ -1228,9 +1228,7 @@
     }
     .label-row .label { margin-bottom: 0; }
 
-    /* ═══════════════════════════
-       LIGHT MODE
-    ═══════════════════════════ */
+    
     body.light-mode { background: #f4f4f7; color: #111; }
     body.light-mode .sidebar { background: #f0f0f0 !important; border-right-color: rgba(0,0,0,0.1); }
     body.light-mode .sidebar-teamname { color: #111; }
@@ -1323,7 +1321,7 @@
 
   <div class="layout" id="layout" style="visibility:hidden">
 
-    <!-- Sidebar -->
+    
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-top">
         <div class="sidebar-teamname" id="sidebarName">—</div>
@@ -1349,10 +1347,10 @@
       </div>
     </aside>
 
-    <!-- Main -->
+    
     <main class="main">
 
-      <!-- ── SECTION 1: TEAM OVERVIEW ── -->
+      
       <section class="section active" id="section-overview">
         <div class="section-header">
           <div class="section-accent" id="accentOv"></div>
@@ -1360,7 +1358,7 @@
           <span class="section-line"></span>
         </div>
 
-        <!-- Team Hero -->
+        
         <div class="team-hero" id="teamHero">
           <div class="team-hero-info">
             <div class="team-hero-name" id="heroTeamName">—</div>
@@ -1370,7 +1368,7 @@
           <div class="team-hero-champs" id="heroChamps">0</div>
         </div>
 
-        <!-- Financial stats -->
+        
         <div class="sub-header">
           <div class="sub-accent" id="subAccentFin"></div>
           <span class="sub-title">Financials</span>
@@ -1404,7 +1402,7 @@
           </div>
         </div>
 
-        <!-- Performance stats -->
+        
         <div class="sub-header mt-8">
           <div class="sub-accent" id="subAccentPerf"></div>
           <span class="sub-title">Performance</span>
@@ -1439,7 +1437,7 @@
         </div>
       </section>
 
-      <!-- ── SECTION 2: CURRENT DRIVERS ── -->
+      
       <section class="section" id="section-drivers">
         <div class="section-header">
           <div class="section-accent" id="accentDrv"></div>
@@ -1447,10 +1445,10 @@
           <span class="section-line"></span>
         </div>
         <div class="grid-3" id="currentDriversGrid">
-          <!-- filled dynamically -->
+          
         </div>
 
-        <!-- Incoming Drivers subsection (shown only when active contracts exist) -->
+        
         <div id="incomingDriversSection" style="display:none">
           <div class="sub-header mt-16">
             <div class="sub-accent" id="subAccentIncoming"></div>
@@ -1458,12 +1456,12 @@
             <span class="sub-line"></span>
           </div>
           <div class="grid-3" id="incomingDriversGrid">
-            <!-- filled dynamically -->
+            
           </div>
         </div>
       </section>
 
-      <!-- ── SECTION 3: SEND OFFER ── -->
+      
       <section class="section" id="section-offer">
         <div class="section-header">
           <div class="section-accent" id="accentOffer"></div>
@@ -1473,7 +1471,7 @@
 
         <div class="grid-2">
 
-          <!-- Driver list panel -->
+          
           <div>
             <div class="drivers-panel">
               <div class="drivers-panel-header">
@@ -1484,21 +1482,21 @@
             </div>
           </div>
 
-          <!-- Offer form -->
+          
           <div class="form-panel">
             <div class="form-section-title">
               <span class="form-title-accent" id="formAccent"></span>
               Compose Offer
             </div>
 
-            <!-- Selected driver display -->
+            
             <div class="form-selected-driver" id="selectedDriverDisplay">
               Select a driver from the list ←
             </div>
 
             <div class="form-divider"></div>
 
-            <!-- Driver dropdown (synced with list) -->
+            
             <div class="field" style="margin-bottom:18px">
               <label>Driver</label>
               <select id="driverSelect">
@@ -1531,7 +1529,7 @@
 
         </div>
 
-        <!-- Sent Offers Tracker -->
+        
         <div class="sent-offers-panel" id="sentOffersPanel">
           <div class="sent-offers-header">
             Sent Offers
@@ -1550,7 +1548,7 @@
     (function () {
       "use strict";
 
-      // ── URL param ────────────────────────────────────────────────────────────
+      
       var teamId = new URLSearchParams(location.search).get("teamId");
 
       if (!teamId) {
@@ -1559,7 +1557,7 @@
         return;
       }
 
-      // ── Cursor ───────────────────────────────────────────────────────────────
+      
       var cur = document.getElementById("cursor");
       var trail = document.getElementById("cursorTrail");
       var mx = 0, my = 0, tx = 0, ty = 0;
@@ -1571,7 +1569,7 @@
         requestAnimationFrame(loop);
       })();
 
-      // ── Toast ────────────────────────────────────────────────────────────────
+      
       var toastEl = document.getElementById("toast");
       var toastTimer;
       function showToast(msg, type) {
@@ -1581,7 +1579,7 @@
         toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 3400);
       }
 
-      // ── Format ───────────────────────────────────────────────────────────────
+      
       function fmt(n) {
         if (!n && n !== 0) return "N/A";
         if (Math.abs(n) >= 1e9) return "$" + (n / 1e9).toFixed(2) + "B";
@@ -1607,7 +1605,7 @@
         return parseFloat(String(end).replace(/[^0-9.]/g, "")) || 0;
       }
 
-      // ── Theme ────────────────────────────────────────────────────────────────
+      
       var accentColor = "#e10600";
 
       function getLuminance(hex) {
@@ -1628,7 +1626,7 @@
 
         document.getElementById("topBar").style.background =
           "linear-gradient(90deg," + accentColor + "," + secondary + "," + accentColor + ")";
-        // Only use team primary color for sidebar if it's dark enough
+        
         var lum = getLuminance(primary);
         document.getElementById("sidebar").style.background = (lum < 0.12) ? primary : "#0a0a0a";
         document.getElementById("sidebarBar").style.background = accentColor;
@@ -1648,7 +1646,7 @@
         }
         var a = accentColor;
 
-        // Safe text accent: skip near-white colors that vanish on dark backgrounds
+        
         var textAc = (function () {
           var th = team.theme;
           if (a.startsWith("#") && getLuminance(a) > 0.7) {
@@ -1689,7 +1687,7 @@
         document.body.style.fontFamily = f;
       }
 
-      // ── Light / Dark mode ────────────────────────────────────────────────────
+      
       function applyThemeMode(mode) {
         if (mode === "light") {
           document.body.classList.add("light-mode");
@@ -1711,7 +1709,7 @@
         applyThemeMode(next);
       });
 
-      // ── Nav wiring ───────────────────────────────────────────────────────────
+      
       function wireNav() {
         document.querySelectorAll(".nav-link").forEach(function (link) {
           link.addEventListener("click", function () {
@@ -1733,16 +1731,16 @@
         });
       }
 
-      // ── Fill Overview ────────────────────────────────────────────────────────
+      
       function fillOverview(team) {
-        // Hero
+        
         document.getElementById("heroTeamName").textContent = team.teamName || "—";
         document.getElementById("heroTeamName").style.color = accentColor;
         document.getElementById("heroShortName").textContent = team.shortName || "";
         document.getElementById("heroChamps").textContent =
           team.performance ? (team.performance.constructorChampionships || 0) : 0;
 
-        // Financial cards
+        
         var f = team.financial || {};
         document.getElementById("ovBudget").textContent = fmt(f.annualBudget);
         document.getElementById("ovCap").textContent = fmt(f.salaryCapAllocation);
@@ -1750,7 +1748,7 @@
         document.getElementById("ovBonus").textContent = fmt(f.bonusPool);
         document.getElementById("ovSigning").textContent = fmt(f.signingBonusAvailable);
 
-        // Performance cards
+        
         var p = team.performance || {};
         document.getElementById("ovChamps").textContent = p.constructorChampionships != null ? p.constructorChampionships : "—";
         document.getElementById("ovLastPos").textContent = p.lastSeasonPosition != null ? ordinal(p.lastSeasonPosition) : "—";
@@ -1758,11 +1756,11 @@
         document.getElementById("ovRel").textContent = p.reliabilityScore != null ? p.reliabilityScore.toFixed(1) : "—";
         document.getElementById("ovAero").textContent = p.aeroEfficiency != null ? p.aeroEfficiency.toFixed(1) : "—";
 
-        // Sidebar name
+        
         document.getElementById("sidebarName").textContent = team.teamName || "—";
       }
 
-      // ── Fill Current Drivers ─────────────────────────────────────────────────
+      
       function fillCurrentDrivers(team, allDrivers) {
         var teamDrivers = allDrivers.filter(function (d) {
           var cid = d.contract && d.contract.teamId;
@@ -1782,7 +1780,7 @@
           return;
         }
 
-        // Sort by driver number
+        
         teamDrivers.sort(function (a, b) {
           return ((a.personalDetails && a.personalDetails.driverNumber) || 99) -
             ((b.personalDetails && b.personalDetails.driverNumber) || 99);
@@ -1829,13 +1827,13 @@
         }).join("");
       }
 
-      // ── Fill Driver List (Send Offer panel) ───────────────────────────────────
+      
       var availableDrivers = [];
       var selectedDriver = null;
       var salaryCap = 0;
 
       function fillDriverList(team, allDrivers) {
-        // Exclude drivers already on this team
+        
         availableDrivers = allDrivers.filter(function (d) {
           var cid = d.contract && d.contract.teamId;
           var ct = d.personalDetails && d.personalDetails.currentTeam || "";
@@ -1847,7 +1845,7 @@
           );
         });
 
-        // Sort by wins desc
+        
         availableDrivers.sort(function (a, b) {
           return ((b.careerStats && b.careerStats.wins) || 0) -
             ((a.careerStats && a.careerStats.wins) || 0);
@@ -1856,7 +1854,7 @@
         document.getElementById("driverCount").textContent =
           availableDrivers.length + " driver" + (availableDrivers.length !== 1 ? "s" : "");
 
-        // Populate clickable list
+        
         var list = document.getElementById("driversList");
         if (availableDrivers.length === 0) {
           list.innerHTML = '<div style="padding:24px;text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem">No available drivers.</div>';
@@ -1886,14 +1884,14 @@
               var d = availableDrivers.find(function (dr) { return dr.driverId === did; });
               if (d) {
                 selectDriver(d);
-                // Sync dropdown
+                
                 document.getElementById("driverSelect").value = did;
               }
             });
           });
         }
 
-        // Populate dropdown
+        
         var sel = document.getElementById("driverSelect");
         sel.innerHTML = '<option value="">— Select a driver —</option>' +
           availableDrivers.map(function (d) {
@@ -1913,7 +1911,7 @@
           var d = availableDrivers.find(function (dr) { return dr.driverId === did; });
           if (d) {
             selectDriver(d);
-            // Sync list highlight
+            
             document.querySelectorAll(".driver-row").forEach(function (r) { r.classList.remove("selected"); });
             var row = document.querySelector('[data-driverid="' + did + '"]');
             if (row) { row.classList.add("selected"); row.scrollIntoView({ block: "nearest" }); }
@@ -1938,7 +1936,7 @@
           '</span>';
         display.classList.add("has-driver");
 
-        // Pre-fill salary
+        
         var curSalary = (driver.financials && driver.financials.annualSalary) || 0;
         document.getElementById("inputSalary").value = curSalary || "";
         updateCapHint();
@@ -1981,7 +1979,7 @@
         }
       }
 
-      // ── Wire Send Offer button ────────────────────────────────────────────────
+      
       function wireSendBtn(team) {
         document.getElementById("inputSalary").addEventListener("input", updateCapHint);
 
@@ -2024,7 +2022,7 @@
             renderSentOffers(teamId);
             fillIncomingDrivers(teamId);
 
-            // Reset
+            
             document.getElementById("driverSelect").value = "";
             clearSelection();
 
@@ -2034,7 +2032,7 @@
         });
       }
 
-      // ── Incoming Drivers (active contracts for this team) ────────────────────
+      
       function fillIncomingDrivers(tid) {
         var contracts = getAllContracts().filter(function (c) {
           return c.teamId === tid && c.status === "active";
@@ -2067,7 +2065,7 @@
         }).join("");
       }
 
-      // ── Sent Offers Tracker ───────────────────────────────────────────────────
+      
       function renderSentOffers(tid) {
         var contracts = getAllContracts().filter(function (c) { return c.teamId === tid; });
         var listEl = document.getElementById("sentOffersList");
@@ -2077,7 +2075,7 @@
           listEl.innerHTML = '<div class="no-offers-msg">No offers sent yet.</div>';
           return;
         }
-        // Most recent first (by contractId timestamp suffix)
+        
         contracts = contracts.slice().reverse();
         listEl.innerHTML = contracts.map(function (c) {
           var dotClass = "dot-" + (c.status || "pending");
@@ -2096,7 +2094,7 @@
         }).join("");
       }
 
-      // ── Boot ─────────────────────────────────────────────────────────────────
+      
       async function boot() {
         try {
           var results = await Promise.all([

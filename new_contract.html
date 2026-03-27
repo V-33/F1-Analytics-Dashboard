@@ -41,7 +41,6 @@
       padding-top: 8px;
     }
 
-    /* ── Header ── */
     .header {
       display: flex;
       justify-content: space-between;
@@ -103,7 +102,6 @@
       flex-shrink: 0;
     }
 
-    /* ── Section header ── */
     .section {
       margin-top: 8px;
     }
@@ -204,7 +202,6 @@
       white-space: nowrap;
     }
 
-    /* Metrics */
     .meta {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -319,9 +316,7 @@
     }
     .btn-theme-toggle:hover { background: rgba(255,255,255,0.13); color: #fff; }
 
-    /* ══════════════════════════
-       LIGHT MODE
-    ══════════════════════════ */
+
     body.light-mode {
       background: #f0f2f5;
       color: #111;
@@ -424,10 +419,8 @@
           var drivers = Array.isArray(driversRaw) ? driversRaw : (driversRaw.drivers || []);
           var allTeams = Array.isArray(teamsRaw) ? teamsRaw : (teamsRaw.teams || []);
 
-          // Seed sample contracts into localStorage on first run
           seedContracts();
 
-          // Find logged-in driver
           var driver = drivers.find(function (d) { return d.driverId === driverId; });
           if (!driver) {
             setStatus("Driver not found.", false);
@@ -437,11 +430,9 @@
 
           var fullName = driver.personalDetails.fullName || driverId;
 
-          // Update page title
           document.getElementById("pageTitle").textContent = fullName.toUpperCase() + " — OFFERED CONTRACTS";
           document.title = fullName + " — Incoming Offers";
 
-          // Get pending contracts for this driver
           var offers = getContractsForDriver(driverId).filter(function (c) { return c.status === "pending" || c.status === "negotiating"; });
 
           if (offers.length === 0) {
@@ -452,7 +443,6 @@
 
           setStatus(offers.length + " offer" + (offers.length === 1 ? "" : "s") + " found", true);
 
-          // Build cards
           grid.innerHTML = offers.map(function (offer) {
             var offerTeam = allTeams.find(function (t) { return t.teamId === offer.teamId; });
             var teamName = offer.teamName || (offerTeam ? offerTeam.teamName : offer.teamId);
@@ -491,7 +481,6 @@
         }
       }
 
-      // ── Pick safe accent per team (excludes near-white/near-black) ──────────
       function pickTeamAccent(team) {
         if (!team || !team.theme) return "#db0a40";
         var neutral = { "#ffffff": 1, "#000000": 1, "#0a0a0a": 1, "#000": 1, "#fff": 1 };

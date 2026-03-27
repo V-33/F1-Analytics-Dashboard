@@ -45,7 +45,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Cursor ── */
+
 .cursor {
   width: 12px; height: 12px;
   background: #e10600;
@@ -68,13 +68,13 @@ body {
 }
 @media (max-width: 600px) { .cursor, .cursor-trail { display: none; } }
 
-/* ── Layout ── */
+
 .layout {
   display: flex;
   min-height: 100vh;
 }
 
-/* ── Sidebar ── */
+
 .sidebar {
   width: 220px;
   min-height: 100vh;
@@ -199,7 +199,7 @@ body {
 }
 .btn-logout:hover { background: rgba(225,6,0,0.25); }
 
-/* ── Main ── */
+
 .main {
   margin-left: 220px;
   flex: 1;
@@ -207,7 +207,7 @@ body {
   min-height: 100vh;
 }
 
-/* ── Top accent bar ── */
+
 .top-bar {
   position: fixed;
   top: 0; left: 0;
@@ -217,7 +217,7 @@ body {
   transition: background 0.4s;
 }
 
-/* ── Sections ── */
+
 .section { display: none; animation: fadeInUp 0.55s ease-out; }
 .section.active { display: block; }
 @keyframes fadeInUp {
@@ -225,7 +225,7 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Section header ── */
+
 .section-header {
   display: flex;
   align-items: center;
@@ -252,7 +252,7 @@ body {
   background: rgba(255,255,255,0.14);
 }
 
-/* ── Grids ── */
+
 .grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -274,7 +274,7 @@ body {
 @media (max-width: 1100px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 700px)  { .grid-4, .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
-/* ── Cards ── */
+
 .card {
   background: #0a0a0a;
   border-radius: 20px;
@@ -353,7 +353,7 @@ body {
 .red       { color: #e10600; }
 .value-gold { color: #b8aa76; }
 
-/* ── Info tooltip ── */
+
 .info-icon {
   display: inline-flex;
   align-items: center;
@@ -399,7 +399,7 @@ body {
 }
 .info-icon:hover::after { opacity: 1; }
 
-/* ── Hero ── */
+
 .hero {
   background: #0a0a0a;
   border-radius: 20px;
@@ -470,7 +470,7 @@ body {
   color: #22c55e;
 }
 
-/* ── Chart boxes ── */
+
 .chart-box {
   background: #0a0a0a;
   border-radius: 20px;
@@ -488,7 +488,7 @@ body {
 }
 .chart-box canvas { max-height: 240px; }
 
-/* ── Progress bar (analytic style) ── */
+
 .progress-bar-wrap {
   height: 6px;
   border-radius: 3px;
@@ -504,7 +504,7 @@ body {
   transition: transform 0.8s ease, background 0.4s;
 }
 
-/* ── Loading ── */
+
 .loading-screen {
   position: fixed; inset: 0;
   background: #000;
@@ -528,7 +528,7 @@ body {
 @keyframes ldpulse { 0%,80%,100%{transform:scale(0.8);opacity:0.5} 40%{transform:scale(1.2);opacity:1} }
 .loading-text { font-size: 0.88rem; color: rgba(255,255,255,0.4); }
 
-/* ── Toast ── */
+
 .toast {
   position: fixed;
   bottom: 32px; right: 32px;
@@ -549,13 +549,13 @@ body {
 .toast.toast-error   { border-color: rgba(225,6,0,0.4);   color: #e10600; }
 .toast.toast-info    { border-color: rgba(96,165,250,0.4); color: #60a5fa; }
 
-/* ── Spacing helpers ── */
+
 .mt-8  { margin-top: 8px; }
 .mt-16 { margin-top: 16px; }
 .mt-24 { margin-top: 24px; }
 .mb-8  { margin-bottom: 8px; }
 
-/* ── Financials v2 ── */
+
 .fin-grid-5 {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -678,7 +678,7 @@ body {
 .salary-chart-box .chart-title { font-size: 0.78rem; margin-bottom: 12px; }
 .salary-chart-box canvas { max-height: 200px; }
 
-/* ── Context card ── */
+
 .context-card {
   background: rgba(14,28,50,0.64);
   backdrop-filter: blur(10px);
@@ -716,7 +716,7 @@ body {
   margin-top: 6px;
 }
 
-/* ── Timeline ── */
+
 .timeline-wrap {
   background: #0a0a0a;
   border-radius: 24px;
@@ -779,7 +779,7 @@ body {
   margin-top: 3px;
 }
 
-/* ── Contract: Progression panel ── */
+
 .prog-panel {
   background: #0a0a0a;
   border-radius: 18px;
@@ -820,7 +820,7 @@ body {
 }
 @media (max-width: 640px) { .prog-meta { grid-template-columns: 1fr; } }
 
-/* ── Contract: Trigger cards ── */
+
 .triggers-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -862,7 +862,7 @@ body {
 }
 @media (max-width: 640px) { .triggers-grid { grid-template-columns: 1fr; } }
 
-/* ── Contract: Risk ── */
+
 .risk-large .value { font-size: 2.2rem; }
 .trend-pill {
   display: inline-block;
@@ -874,15 +874,13 @@ body {
   font-size: 0.76rem;
 }
 
-/* ── Neg/Compare (kept for compat) ── */
+
 .neg-slider { accent-color: #e10600; cursor: pointer; }
 .delta-pos { color: #22c55e; font-size: 0.78rem; margin-left: 6px; }
 .delta-neg { color: #e10600; font-size: 0.78rem; margin-left: 6px; }
 .delta-neu { color: rgba(255,255,255,0.4); font-size: 0.78rem; margin-left: 6px; }
 
-/* ══════════════════════════════
-   LIGHT MODE
-══════════════════════════════ */
+
 body.light-mode {
   background: #f4f4f7;
   color: #111;
@@ -907,7 +905,7 @@ body.light-mode .btn-offers {
   border-color: rgba(0,0,0,0.15);
   color: #111;
 }
-body.light-mode .main { /* no bg change needed, inherited from body */ }
+body.light-mode .main {  }
 body.light-mode .card {
   background: #fff !important;
   border-color: rgba(0,0,0,0.1) !important;
@@ -1003,7 +1001,7 @@ body.light-mode .fin-card .value { color: #111; }
 body.light-mode .fin-card .note { color: rgba(0,0,0,0.45); }
 body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
 
-/* ── Responsive ── */
+
 @media (max-width: 700px) {
   .sidebar { display: none; }
   .main { margin-left: 0; padding: 20px 16px 40px; }
@@ -1028,7 +1026,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
 
 <div class="layout" id="layout" style="visibility:hidden">
 
-  <!-- ── Sidebar ── -->
+  
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-top">
       <div class="sidebar-driver" id="sidebarDriver">—</div>
@@ -1055,10 +1053,10 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     </div>
   </aside>
 
-  <!-- ── Main ── -->
+  
   <main class="main">
 
-    <!-- ══ SECTION 1: OVERVIEW ══ -->
+    
     <section class="section active" id="section-overview">
       <div class="section-header">
         <div class="section-accent" id="accentOv"></div>
@@ -1104,10 +1102,10 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
         <span class="section-title" style="font-size:1.1rem">Career Stats</span>
         <span class="section-line"></span>
       </div>
-      <div class="grid-4" id="careerStatsGrid"><!-- filled dynamically --></div>
+      <div class="grid-4" id="careerStatsGrid"></div>
     </section>
 
-    <!-- ══ SECTION 2: FINANCIALS ══ -->
+    
     <section class="section" id="section-financials">
       <div class="section-header">
         <div class="section-accent" id="accentFin"></div>
@@ -1234,7 +1232,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
       </div>
     </section>
 
-    <!-- ══ SECTION 3: CONTRACT ══ -->
+    
     <section class="section" id="section-contract">
       <div class="section-header">
         <div class="section-accent" id="accentCnt"></div>
@@ -1242,7 +1240,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
         <span class="section-line"></span>
       </div>
 
-      <!-- CONTRACT SNAPSHOT -->
+      
       <div class="section-header mt-8">
         <div class="section-accent" id="accentCntSnap"></div>
         <span class="section-title" style="font-size:1.05rem">Contract Snapshot</span>
@@ -1285,7 +1283,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
         </div>
       </div>
 
-      <!-- CONTRACT PROGRESSION -->
+      
       <div class="section-header mt-8">
         <div class="section-accent" id="accentCntProg"></div>
         <span class="section-title" style="font-size:1.05rem">Contract Progression Status</span>
@@ -1312,7 +1310,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
         <p class="prog-footnote" id="progFootnote">Based on contract timeline progression</p>
       </div>
 
-      <!-- KEY CLAUSES -->
+      
       <div class="section-header mt-8">
         <div class="section-accent" id="accentCntClause"></div>
         <span class="section-title" style="font-size:1.05rem">Key Clauses</span>
@@ -1341,7 +1339,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
         </div>
       </div>
 
-      <!-- PERFORMANCE TRIGGERS -->
+      
       <div class="section-header mt-8">
         <div class="section-accent" id="accentCntTrig"></div>
         <span class="section-title" style="font-size:1.05rem">Performance Trigger Status</span>
@@ -1382,7 +1380,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
         </div>
       </div>
 
-      <!-- RISK PROFILE -->
+      
       <div class="section-header mt-8">
         <div class="section-accent" id="accentCntRisk"></div>
         <span class="section-title" style="font-size:1.05rem">Contract Risk Profile</span>
@@ -1406,7 +1404,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
         </div>
       </div>
 
-      <!-- TEAM CONTEXT -->
+      
       <div class="section-header mt-8">
         <div class="section-accent" id="accentCntCtx"></div>
         <span class="section-title" style="font-size:1.05rem">Team Context</span>
@@ -1427,14 +1425,14 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
         </div>
       </div>
 
-      <!-- CONTRACT TIMELINE -->
+      
       <div class="section-header mt-8">
         <div class="section-accent" id="accentCntTime"></div>
         <span class="section-title" style="font-size:1.05rem">Contract Timeline</span>
         <span class="section-line"></span>
       </div>
       <div class="timeline-wrap">
-        <div class="timeline" id="contractTimeline"><!-- filled dynamically --></div>
+        <div class="timeline" id="contractTimeline"></div>
       </div>
 
     </section>
@@ -1446,11 +1444,11 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
 (function () {
   "use strict";
 
-  // ── Auth ──────────────────────────────────────────────────────────────────
+  
   var driverId = localStorage.getItem("loggedInDriver");
   if (!driverId) { location.replace("index.html"); return; }
 
-  // ── Cursor ────────────────────────────────────────────────────────────────
+  
   var cur = document.getElementById("cursor");
   var trail = document.getElementById("cursorTrail");
   var mx = 0, my = 0, tx = 0, ty = 0;
@@ -1462,7 +1460,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     requestAnimationFrame(animCursor);
   })();
 
-  // ── Toast ─────────────────────────────────────────────────────────────────
+  
   var toastEl = document.getElementById("toast");
   var toastTimer;
   function showToast(msg, type) {
@@ -1472,7 +1470,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 3200);
   }
 
-  // ── Format helpers ────────────────────────────────────────────────────────
+  
   function fmt(n) {
     if (!n && n !== 0) return "N/A";
     var v = Math.abs(n);
@@ -1495,7 +1493,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     return 0;
   }
 
-  // ── Luminance (for safe sidebar color) ───────────────────────────────────
+  
   function getLuminance(hex) {
     if (!hex || !hex.startsWith("#")) return 0;
     var h = hex.replace("#", "");
@@ -1515,7 +1513,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     return "rgba("+parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)+","+a+")";
   }
 
-  // ── Theme state ───────────────────────────────────────────────────────────
+  
   var accentColor = "#e10600";
 
   function applyTheme(team) {
@@ -1529,7 +1527,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     document.getElementById("cursor").style.background = accentColor;
     document.getElementById("cursorTrail").style.borderColor = accentColor;
 
-    // Only apply team primaryColor to sidebar if it's dark enough
+    
     var lum = getLuminance(primaryColor);
     document.getElementById("sidebar").style.background = (lum < 0.12) ? primaryColor : "#0a0a0a";
 
@@ -1537,7 +1535,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     var ac18 = isHex ? hexAlpha(accentColor, 0.18) : accentColor;
     var ac12 = isHex ? hexAlpha(accentColor, 0.12) : accentColor;
 
-    // Safe text accent: fall back from near-white colors that won't show on dark bg
+    
     var textAc = (function () {
       var ac = accentColor, th = team.theme;
       if (ac.startsWith("#") && getLuminance(ac) > 0.7) {
@@ -1583,7 +1581,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     document.body.style.fontFamily = f;
   }
 
-  // ── Light / Dark mode ─────────────────────────────────────────────────────
+  
   function applyThemeMode(mode) {
     if (mode === "light") {
       document.body.classList.add("light-mode");
@@ -1603,14 +1601,14 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     applyThemeMode(next);
   });
 
-  // ── Sidebar ───────────────────────────────────────────────────────────────
+  
   function fillSidebar(driver, team) {
     document.getElementById("sidebarDriver").textContent = driver.personalDetails.fullName || "Driver";
     document.getElementById("sidebarTeam").textContent = team ? team.teamName : (driver.personalDetails.currentTeam || "—");
     document.title = "F1 Dashboard — " + (driver.personalDetails.fullName || "Driver");
   }
 
-  // ── Overview ──────────────────────────────────────────────────────────────
+  
   function fillOverview(driver, team) {
     var pd = driver.personalDetails, cs = driver.careerStats;
     var fin = driver.financials,     ctr = driver.contract;
@@ -1664,7 +1662,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     }).join("");
   }
 
-  // ── Financials ────────────────────────────────────────────────────────────
+  
   var finChartsBuilt = false;
   function fillFinancials(driver, team) {
     var fin = driver.financials, cs = driver.careerStats, ctr = driver.contract;
@@ -1708,7 +1706,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
       document.getElementById("salSegEndo").style.transform  = "scaleX(1)";
     }, 150);
 
-    // Analytics — always use annualSalary
+    
     var wins    = Math.max(cs.wins || 0, 1);
     var podiums = Math.max(cs.podiums || 0, 1);
     var poles   = Math.max(cs.polePositions || 0, 1);
@@ -1777,7 +1775,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     });
   }
 
-  // ── Contract helpers ──────────────────────────────────────────────────────
+  
   function calcTriggers(driver) {
     var cs = driver.careerStats;
     var gps = cs.grandPrixEntered || 1, pods = cs.podiums || 0;
@@ -1807,7 +1805,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     return {stabilityRating:stab, renewalProbability:renew, marketValueTrend:trend, trendPill:pill};
   }
 
-  // ── Contract section ──────────────────────────────────────────────────────
+  
   function fillContract(driver, team, allDrivers) {
     var c  = driver.contract, f = driver.financials;
     var cs = driver.careerStats, pd = driver.personalDetails;
@@ -1823,7 +1821,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     var totalPotential = cd ? cd.totalPotentialValue : (salary * durNum + bonusPotential * durNum);
     var totalDuration  = cd ? cd.totalDurationYears  : durNum;
 
-    // Snapshot
+    
     document.getElementById("snapStart").textContent   = startYr || "—";
     document.getElementById("snapEnd").textContent     = endYr   || "—";
     var durLabel = totalDuration ? totalDuration + (totalDuration===1?" Yr":" Yrs") : "—";
@@ -1835,7 +1833,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     document.getElementById("snapTotal").textContent    = "~" + fmt(totalPotential);
     document.getElementById("snapRelease").textContent  = fmt(c.releaseClause);
 
-    // Progression
+    
     var YEAR = new Date().getFullYear();
     var prog = cd && cd.progression;
     var yrsCompleted = prog ? prog.yearsCompleted : Math.max(0, YEAR - (startYr||YEAR));
@@ -1847,14 +1845,14 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     document.getElementById("progPct").textContent       = fulfillPct + "%";
     document.getElementById("progBar").style.width       = cap(fulfillPct,0,100) + "%";
 
-    // Key clauses
+    
     var minPos = (c.performanceClauses && c.performanceClauses.minimumPosition) || "—";
     document.getElementById("clausePodium").textContent  = fmt(pb.perPodium || 0);
     document.getElementById("clauseChamp").textContent   = fmt(pb.championshipBonus || 0);
     document.getElementById("clauseMinPos").textContent  = "Top-" + minPos + " Constructors";
     document.getElementById("clauseRelease").textContent = fmt(c.releaseClause);
 
-    // Triggers
+    
     var trig = (cd && cd.triggers) || calcTriggers(driver);
     [
       ["trigPodiumPct","trigPodiumBar","trigPodiumNote", trig.podium],
@@ -1867,18 +1865,18 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
       document.getElementById(row[2]).textContent = row[3].note;
     });
 
-    // Risk
+    
     var risk = (cd && cd.risk) || calcRisk(driver);
     document.getElementById("riskStability").textContent = risk.stabilityRating + " / 10";
     document.getElementById("riskRenewal").textContent   = cap(risk.renewalProbability,0,100) + "%";
     document.getElementById("riskTrend").textContent     = risk.marketValueTrend;
     document.getElementById("riskPill").textContent      = risk.trendPill;
 
-    // Team context
+    
     var budget = (team && team.financial && team.financial.annualBudget) || 500000000;
     document.getElementById("ctxShare").textContent = ((salary/budget)*100).toFixed(1) + "%";
 
-    // Salary rank — compare with real teammates
+    
     var teamId   = c && c.teamId;
     var teamName = c && c.team;
     var teammates = (allDrivers||[]).filter(function(d) {
@@ -1895,7 +1893,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     document.getElementById("ctxRank").textContent = "#" + Math.max(1,rank) + " of " + allSals.length;
     document.getElementById("ctxCap").textContent  = (cd && cd.teamContext && cd.teamContext.budgetCapExemptionStatus) || "Exempt";
 
-    // Timeline
+    
     var debutYear = pd.f1Debut && pd.f1Debut.year;
     var debutTeam = pd.f1Debut && pd.f1Debut.team;
     var ctrTeam   = (c.team) || (team ? team.teamName : "");
@@ -1915,7 +1913,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     }).join("");
   }
 
-  // ── Nav wiring ────────────────────────────────────────────────────────────
+  
   function wireNav() {
     document.querySelectorAll(".nav-link[data-target]").forEach(function (link) {
       link.addEventListener("click", function () {
@@ -1939,7 +1937,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     });
   }
 
-  // ── Resolve team ──────────────────────────────────────────────────────────
+  
   function resolveTeam(driver, allTeams) {
     var teamId = driver.contract && driver.contract.teamId;
     if (teamId) {
@@ -1957,7 +1955,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
     return null;
   }
 
-  // ── Boot ──────────────────────────────────────────────────────────────────
+  
   async function boot() {
     try {
       var results = await Promise.all([
@@ -1991,7 +1989,7 @@ body.light-mode .context-card .label { color: rgba(0,0,0,0.5); }
       document.getElementById("loadingScreen").style.display = "none";
       document.getElementById("layout").style.visibility = "visible";
 
-      // Hash deep-link: #overview, #financials, #contract
+      
       var hash = location.hash.replace("#","");
       var hashMap = {overview:"section-overview", financials:"section-financials", contract:"section-contract"};
       if (hash && hashMap[hash]) {

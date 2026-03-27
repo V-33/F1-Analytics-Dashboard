@@ -1,9 +1,9 @@
-// contracts.js — localStorage-backed contract management
+
 const CONTRACTS_KEY = "f1_contracts";
 
-// Three sample pending contracts seeded on first run.
-// seedContracts() can be called with no arguments — it uses these defaults.
-// Optionally pass an array to override (e.g. during testing).
+
+
+
 function seedContracts(contractsArray) {
   if (!localStorage.getItem(CONTRACTS_KEY)) {
     var defaults = [
@@ -60,25 +60,20 @@ function seedContracts(contractsArray) {
   }
 }
 
-// Read all contracts from storage. Returns an array (empty if nothing stored).
+
 function getAllContracts() {
   const raw = localStorage.getItem(CONTRACTS_KEY);
   return raw ? JSON.parse(raw) : [];
 }
 
-// Persist the full contracts array back to storage.
+
 function saveAllContracts(contracts) {
   localStorage.setItem(CONTRACTS_KEY, JSON.stringify(contracts));
 }
 
-// ─── Public API ───────────────────────────────────────────────────────────────
 
-/**
- * Add a new contract.
- * Throws if a contract with the same contractId already exists.
- * @param {Object} contract — must include at minimum: contractId, teamId, driverId, status
- * @returns {Object} the saved contract
- */
+
+
 function createContract(contract) {
   if (!contract.contractId || !contract.teamId || !contract.driverId) {
     throw new Error("createContract: contractId, teamId, and driverId are required.");
@@ -96,23 +91,13 @@ function createContract(contract) {
   return newContract;
 }
 
-/**
- * Get all contracts for a given driver.
- * @param {string} driverId — e.g. "DRV01"
- * @returns {Array} array of matching contract objects (may be empty)
- */
+
 function getContractsForDriver(driverId) {
   if (!driverId) return [];
   return getAllContracts().filter(c => c.driverId === driverId);
 }
 
-/**
- * Update the status of a contract.
- * Valid statuses: "pending", "active", "expired", "terminated", "negotiating"
- * @param {string} contractId — e.g. "CTR001"
- * @param {string} newStatus
- * @returns {Object|null} the updated contract, or null if not found
- */
+
 function updateContractStatus(contractId, newStatus) {
   const validStatuses = ["pending", "active", "expired", "terminated", "negotiating"];
   if (!validStatuses.includes(newStatus)) {

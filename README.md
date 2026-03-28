@@ -12,6 +12,8 @@ The app supports two authentication roles:
 A third entry point — **Fantasy** — gives read-only access to a separate analytics portal (`fantasy.html`) covering all 20 drivers and 10 teams.
 
 ---
+Website Link - https://v-33.github.io/F1-Analytics-Dashboard/
+---
 
 ## Tech Stack
 

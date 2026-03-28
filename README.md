@@ -29,7 +29,6 @@ A third entry point — **Fantasy** — gives read-only access to a separate ana
 ## File Structure
 
 ```
-teams/
 ├── index.html                          Login page (driver + team manager + fantasy portals)
 ├── dashboard.html                      Driver dashboard (Overview / Financials / Contract)
 ├── team.html                           Team manager dashboard
@@ -37,16 +36,9 @@ teams/
 ├── offer_compare.html                  Side-by-side offer comparison with charts and counter-offer simulator
 ├── fantasy.html                        Fantasy portal (Drivers / Teams / Head to Head tabs)
 ├── contracts.js                        Shared localStorage-backed contract CRUD API
-├── colour_scheme.md                    Team brand colour reference
-├── CREDENTIALS.md                      Login credentials reference
 ├── backend/
 │   ├── f1_2025_drivers_Dataset.json    20 drivers — personal details, career stats, financials, contract
 │   └── f1_teams_dataset.json           10 teams — theme colours, performance metrics, financials
-└── fonts/
-    ├── UnitySans-Regular.woff2 / .woff
-    ├── UnitySans-Bold.woff2 / .woff
-    ├── FuturaCyrillicBook.woff2 / .woff
-    └── FuturaCyrillicBold.woff2 / .woff
 ```
 
 ### File descriptions
@@ -78,10 +70,6 @@ teams/
 - `theme` — primary, secondary, accent (hex colours)
 - `performance` — lastSeasonPosition, developmentIndex, reliabilityScore, aeroEfficiency, championships
 - `financial` — annualBudget, salaryCapAllocation, sponsorRevenue, bonusPool, signingBonusAvailable
-
-**`colour_scheme.md`** — Human-readable reference for each team's brand colours used in the theme system.
-
-**`CREDENTIALS.md`** — Quick reference for all demo login credentials.
 
 ---
 
@@ -583,13 +571,3 @@ Because driver objects do not always have a `contract.teamId`, team resolution u
 Returns `null` if no match is found; the page degrades gracefully (theme stays default F1 red).
 
 ---
-
-## Known Data Notes
-
-- **No `teamId` on most driver contracts:** driver `contract` objects use a `team` string (e.g. `"Red Bull Racing"`) rather than a `teamId`. The `resolveTeam()` fuzzy matching handles this, but it is sensitive to name differences between the two datasets (e.g. `"Kick Sauber"` vs `"Sauber"`).
-- **Career stats are static:** all `careerStats` values come directly from the JSON file and are not recalculated or updated by any user action.
-- **Contract dates are strings:** `contract.startDate` and `contract.endDate` use `YYYY-MM-DD` format. Year extraction is done with `.substring(0, 4)` or `.slice(0, 4)`.
-- **Duration is calendar-year difference:** `endYear − startYear`, not a race-season count. A 2025–2027 contract shows as `2 yrs`.
-- **`uiData.contractDashboard` overrides:** the JSON dataset may include a `uiData.contractDashboard` block with pre-authored values for bonus potential, progression, triggers, and risk. These take priority over the live-calculated versions. If absent, all values are computed from `careerStats`.
-- **localStorage is per-browser:** contract offers sent via `team.html` are only visible to the same browser session. There is no server-side persistence.
-- **`seedContracts()` is idempotent:** it only writes to `localStorage` if `"f1_contracts"` is not already set. Clearing `localStorage` resets all contract data to the three defaults.
